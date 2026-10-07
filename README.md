@@ -7,11 +7,11 @@ A Chrome extension for **Cisco Secure Access (SSE)** that evaluates and explains
 ## Quick Start & Installation
 
 ### Option 1: Download ZIP (Recommended)
-1. Download [`cisco-secure-access-policy-checker.zip`](cisco-secure-access-policy-checker.zip) from the repository root.
-2. Unzip the file into a folder on your computer.
+1. Click the green **Code** button at the top of the repository and choose **Download ZIP** (or [click here to download](https://github.com/technoxi/cisco-secure-access-policy-checker/archive/refs/heads/main.zip)).
+2. Unzip the downloaded archive.
 3. Open Google Chrome and navigate to `chrome://extensions`.
 4. Turn on **Developer mode** in the top-right corner.
-5. Click **Load unpacked** and select the unzipped `extension/` folder.
+5. Click **Load unpacked** and select the `extension/` folder inside the unzipped repository.
 
 ### Option 2: Clone with Git
 ```bash
