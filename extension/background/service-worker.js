@@ -2771,41 +2771,147 @@ async function resolveExclusions(orgId, tabId) {
     const res = await fetch(api.runtime.getURL("data/exclusions-lookup.json"));
     if (res.ok) fallback = (await res.json()) || [];
   } catch (_) {}
+
+  const defaultLocal = [
+    { id: "default-rfc1918", domain: "RFC-1918", description: "Non-publicly routable address spaces used only for reverse DNS on internal", intent: "Bypass Secure Access", appliesTo: "All Devices" },
+    { id: "default-local", domain: "local", description: "All *.local domains", intent: "Bypass Secure Access", appliesTo: "All Devices" },
+    { id: "default-arpa", domain: "10.in-addr.arpa", description: "", intent: "Bypass Secure Access", appliesTo: "All Devices" },
+  ];
+
+  const liveItems = [];
+
   try {
-    const tokenObj = await getFreshToken("sse_token", tabId);
-    if (!tokenObj) return fallback;
-    const response = await fetch("https://api.sse.cisco.com/deployments/v2/internaldomains", {
-      headers: {
-        Authorization: `Bearer ${tokenObj.token}`,
+    const sseTokenObj = await getFreshToken("sse_token", tabId);
+    if (sseTokenObj) {
+      const response = await fetch("https://api.sse.cisco.com/deployments/v2/internaldomains", {
+        headers: {
+          Authorization: `Bearer ${sseTokenObj.token}`,
+          Accept: "application/json",
+          Origin: "https://dashboard.sse.cisco.com",
+          Referer: "https://dashboard.sse.cisco.com/",
+        },
+      });
+      if (response.ok) {
+        const json = await response.json();
+        const items = Array.isArray(json) ? json : (json?.data || json?.results || json?.items || []);
+        for (const item of items) {
+          if (!item || !(item.domain || item.name)) continue;
+          let appliesTo = "All Devices, All Sites";
+          if (item.type) {
+            const hasVa = !!item.type.va;
+            const hasRoaming = !!item.type.roaming;
+            const hasSites = Array.isArray(item.type.sites) && item.type.sites.length > 0;
+            if (hasVa && hasRoaming) appliesTo = hasSites ? "All Devices, Some Sites" : "All Devices, All Sites";
+            else if (hasVa && !hasRoaming) appliesTo = hasSites ? "Some Sites" : "All Sites";
+            else if (hasRoaming) appliesTo = "All Devices";
+          }
+          liveItems.push({
+            id: item.id ? String(item.id) : `int-${liveItems.length}`,
+            domain: item.domain || item.name,
+            description: item.description || "",
+            intent: "Bypass Secure Access",
+            appliesTo,
+          });
+        }
+      }
+    }
+  } catch (err) {
+    logEvent("catalog-fetch", "Internal domains fetch error", { error: err.message });
+  }
+
+  if (!liveItems.length) {
+    try {
+      const openDnsTokenObj = await getFreshToken("opendns_token", tabId);
+      if (openDnsTokenObj && orgId) {
+        const response = await fetch(`https://api.opendns.com/v3/organizations/${orgId}/internaldomains?filters={"includeGlobal":false}`, {
+          headers: {
+            Authorization: `Bearer ${openDnsTokenObj.token}`,
+            Accept: "application/json",
+            Origin: "https://dashboard.sse.cisco.com",
+            Referer: "https://dashboard.sse.cisco.com/",
+          },
+        });
+        if (response.ok) {
+          const json = await response.json();
+          const items = Array.isArray(json) ? json : [];
+          for (const item of items) {
+            if (!item || !item.domain) continue;
+            liveItems.push({
+              id: item.id ? String(item.id) : `int-${liveItems.length}`,
+              domain: item.domain,
+              description: item.description || "",
+              intent: "Bypass Secure Access",
+              appliesTo: "All Devices, All Sites",
+            });
+          }
+        }
+      }
+    } catch (_) {}
+  }
+
+  try {
+    const mgmtTokenObj = await getFreshToken("mgmt_authz_token", tabId);
+    if (mgmtTokenObj && orgId) {
+      const headers = {
+        Authorization: `Bearer ${mgmtTokenObj.token}`,
         Accept: "application/json",
         Origin: "https://dashboard.sse.cisco.com",
         Referer: "https://dashboard.sse.cisco.com/",
-      },
-    });
-    if (!response.ok) return fallback;
-    const json = await response.json();
-    const items = Array.isArray(json) ? json : (json?.data || json?.results || json?.items || []);
-    const orgItems = (items || []).map((item, idx) => ({
-      id: item.id || `ex-${idx}`,
-      domain: item.domain || item.name || item.domainName,
-      description: item.description || "",
-      intent: item.intent || (item.bypassWebProxy ? "Bypass Web Proxy" : "Bypass Secure Access"),
-      appliesTo: item.appliesTo || (item.includeAllVAs && item.includeAllMobileDevices ? "All Devices, All Sites" : "All Devices, All Sites"),
-    })).filter(item => item.domain);
-    const merged = [...orgItems];
-    const seen = new Set(orgItems.map(e => (e.domain || "").toLowerCase().trim()));
-    for (const fb of fallback) {
-      const d = (fb.domain || "").toLowerCase().trim();
-      if (d && !seen.has(d)) {
-        merged.push(fb);
-        seen.add(d);
-      }
+      };
+
+      try {
+        const domResp = await fetch(`https://management.api.umbrella.com/api/v1/organizations/${orgId}/domains`, { headers });
+        if (domResp.ok) {
+          const json = await domResp.json();
+          const list = Array.isArray(json) ? json : (json?.data || []);
+          for (const item of list) {
+            if (!item || !item.domain) continue;
+            liveItems.push({
+              id: item.id ? String(item.id) : `ext-dom-${liveItems.length}`,
+              domain: item.domain,
+              description: item.description || "",
+              intent: "Bypass Web Proxy",
+              appliesTo: "Hosted PAC, AnyConnect",
+            });
+          }
+        }
+      } catch (_) {}
+
+      try {
+        const ipResp = await fetch(`https://management.api.umbrella.com/api/v1/organizations/${orgId}/ips`, { headers });
+        if (ipResp.ok) {
+          const json = await ipResp.json();
+          const list = (json?.data?.ips) || (Array.isArray(json?.data) ? json.data : []) || [];
+          for (const item of list) {
+            if (!item || !item.ip) continue;
+            liveItems.push({
+              id: item.id ? String(item.id) : `ext-ip-${liveItems.length}`,
+              domain: item.ip,
+              description: item.description || "",
+              intent: "Bypass Web Proxy",
+              appliesTo: "AnyConnect",
+            });
+          }
+        }
+      } catch (_) {}
     }
-    return merged;
   } catch (err) {
-    logEvent("catalog-fetch", "Exclusions fetch failed", { error: err.message });
-    return fallback;
+    logEvent("catalog-fetch", "External exclusions fetch error", { error: err.message });
   }
+
+  const merged = [];
+  const seen = new Set();
+  for (const item of [...liveItems, ...defaultLocal, ...fallback]) {
+    if (!item || !item.domain) continue;
+    const d = item.domain.toLowerCase().trim();
+    const intent = item.intent || "Bypass Secure Access";
+    const key = `${intent}:${d}`;
+    if (!seen.has(key)) {
+      seen.add(key);
+      merged.push({ ...item, domain: item.domain.trim(), intent });
+    }
+  }
+  return merged;
 }
 
 // Activity Search names a branch "Branch With Peer ID 140147", while the

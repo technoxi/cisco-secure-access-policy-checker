@@ -77,7 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // ---------------------------------------------------------------------------
   function lookupDestination(host, orgId) {
     return new Promise((resolve) => {
-      const timer = setTimeout(() => resolve({ ok: false, error: "timeout" }), 50000);
+      const timer = setTimeout(() => resolve({ ok: false, error: "timeout" }), 4000);
       try {
         api.runtime.sendMessage({ type: "LOOKUP_DESTINATION", host, orgId }, (response) => {
           clearTimeout(timer);
@@ -177,15 +177,20 @@ document.addEventListener("DOMContentLoaded", () => {
         const snapshot = policySnapshot();
         if (!snapshot.rules.length) return { error: "No rules are loaded yet. Open the dashboard's policy page and wait for the data to load." };
         const lookups = await buildLookups(snapshot);
-        // Ask Cisco Investigate what the domain is (categories, threats, app)
-        // so the checker does not have to ask; answers the user gave win.
+        const earlyExclusion = window.TrafficPath.matchExclusion(request.destination.host, lookups.exclusions);
         let destinationLookup = null;
-        if (options.autoLookup !== false && request.destination.kind === "domain") {
+        if (earlyExclusion && earlyExclusion.intent === "Bypass Secure Access") {
+          destinationLookup = { ok: false, bypassed: true, reason: `Bypasses Secure Access via Traffic Steering (${earlyExclusion.domain})` };
+        } else if (options.autoLookup !== false && request.destination.kind === "domain") {
           let lookupOrgId = new URLSearchParams(window.location.search).get("orgId");
           if (!lookupOrgId && isEmbeddedInPage()) lookupOrgId = await requestOrgIdFromParent();
-          destinationLookup = await lookupDestination(request.destination.host, lookupOrgId);
-          if (destinationLookup && destinationLookup.ok) {
-            request = { ...request, facts: { ...window.TrafficPath.factsFromLookup(destinationLookup, lookups), ...request.facts } };
+          try {
+            destinationLookup = await lookupDestination(request.destination.host, lookupOrgId);
+            if (destinationLookup && destinationLookup.ok) {
+              request = { ...request, facts: { ...window.TrafficPath.factsFromLookup(destinationLookup, lookups), ...request.facts } };
+            }
+          } catch (_) {
+            destinationLookup = { ok: false, error: "lookup failed" };
           }
         }
         if (snapshot.revision !== dataRevision) return { error: "Policy data changed. Check again with the updated rules." };

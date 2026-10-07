@@ -445,6 +445,9 @@
     for (const ex of exclusions) {
       if (!ex || !ex.domain) continue;
       let pattern = ex.domain.toLowerCase().trim();
+      if (pattern === "rfc-1918") {
+        if (isPrivateIp(target)) return ex;
+      }
       if (pattern.startsWith("*.")) {
         const suffix = pattern.slice(2);
         if (target === suffix || target.endsWith("." + suffix)) return ex;
@@ -768,7 +771,7 @@
   root.TrafficPath = {
     CONNECTIONS, SOURCES, STAGES, PROTOCOLS,
     parseDestination, resolveScope, groupsContaining, buildRequest, planStages,
-    evaluate, questionFor, threatQuestion, answer, factsFromLookup, actionLabel, webProfile, catalogLabel, valueLabel,
+    evaluate, matchExclusion, questionFor, threatQuestion, answer, factsFromLookup, actionLabel, webProfile, catalogLabel, valueLabel,
   };
   if (typeof module !== "undefined" && module.exports) module.exports = root.TrafficPath;
 })(typeof window !== "undefined" ? window : globalThis);
