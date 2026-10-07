@@ -1,51 +1,77 @@
-# Secure Access Policy Checker
+# Cisco Secure Access Policy Checker
 
-A Chrome extension that overlays the **Cisco Secure Access** dashboard to analyze access policy rules in real time. It intercepts dashboard API calls, resolves identity/destination/application names, and highlights rule issues (shadowing, duplicates, overly permissive allows) directly in the policy UI.
+A Chrome extension for **Cisco Secure Access (SSE)** that evaluates and explains policy verdicts in real time. It overlays directly onto the Secure Access dashboard to test traffic paths (DNS, Web, Firewall, Private Access), inspect rule evaluations, resolve names, and verify exclusions and traffic steering.
 
-## Install
+---
+
+## Quick Start & Installation
 
 ### Option 1: Download ZIP (Recommended)
-1. Download or unzip `cisco-secure-access-policy-checker.zip` (available from the repository releases or root)
-2. Extract the archive into a folder
-3. Open Google Chrome and navigate to `chrome://extensions`
-4. Toggle **Developer mode** on (top right)
-5. Click **Load unpacked** and select the unzipped `extension/` directory
+1. Download [`cisco-secure-access-policy-checker.zip`](cisco-secure-access-policy-checker.zip) from the repository root.
+2. Unzip the file into a folder on your computer.
+3. Open Google Chrome and navigate to `chrome://extensions`.
+4. Turn on **Developer mode** in the top-right corner.
+5. Click **Load unpacked** and select the unzipped `extension/` folder.
 
 ### Option 2: Clone with Git
-1. `git clone https://github.com/technoxi/cisco-secure-access-policy-checker.git`
-2. Open `chrome://extensions` and enable **Developer mode**
-3. Click **Load unpacked** and select the `extension/` directory
+```bash
+git clone https://github.com/technoxi/cisco-secure-access-policy-checker.git
+```
+Then load the `extension/` directory into `chrome://extensions` via **Load unpacked**.
 
-## How it works
+---
 
-The extension runs a service worker that intercepts the dashboard's SSE token when you visit `dashboard.sse.cisco.com`. It then fetches rules, identities, identity types, and destination objects from the Cisco APIs and stores them locally. The popup reads from local storage to render a policy overview with resolved names and flagged issues.
+## How to Use
 
-## Policy Checker
+1. **Sign in to Cisco Secure Access**: Open [dashboard.sse.cisco.com](https://dashboard.sse.cisco.com) in Chrome.
+2. **Navigate to Policy Rules**: Open **Secure > Policy > Rules** (or your access rules page).
+3. **Open the Policy Checker**: Click the floating shield button in the bottom corner of the page, or click the extension icon in the Chrome toolbar.
+4. **Simulate a Request**:
+   - Choose your **Connection** method (Secure Client, Remote Access VPN, Site-to-site tunnel, On-prem VA, or Network DNS).
+   - Pick or search your **Source identities** (Roaming Computer, User, AD Group, or Site).
+   - Enter your **Destination** (e.g. `example.com`, an internal IP like `10.141.46.1`, or an excluded domain like `api.us-2.crowdstrike.com`).
+   - Click **Check destination**.
 
-On the dashboard's policy page, the shield button opens the checker. It predicts which rule a request hits at each enforcement point, like Umbrella's policy tester:
+---
 
-| Connection | Sources you can give | Stages evaluated |
+## Key Features
+
+### 1. Accurate Multi-Stage Pipeline Evaluation
+Simulates the actual Cisco Secure Access enforcement order based on connection type:
+
+| Connection Type | Supported Sources | Enforcement Pipeline |
 |---|---|---|
-| Secure Client | Roaming computer, user or group | DNS → Web |
-| On-prem VA | Site, internal client IP, user or group, AD computer, egress network | DNS |
-| Remote access VPN | User or group, AD computer, VPN (internal) IP | Firewall → Web |
-| Network DNS | Registered network (public IP) | DNS |
-| Site-to-site tunnel | Network tunnel, SD-WAN branch, internal client IP, user or group, AD computer, SD-WAN VPN, security group tag | Firewall → Web |
+| **Secure Client** | Roaming computer, user or group | DNS → Web |
+| **Remote Access VPN** | User or group, AD computer, VPN client IP | Firewall → Web |
+| **Site-to-site Tunnel** | Network tunnel, SD-WAN branch, internal IP, user/group | Firewall → Web |
+| **On-prem VA** | Site, internal IP, user or group, AD computer | DNS |
+| **Network DNS** | Registered network (public IP) | DNS |
 
-- The request carries every identity you fill in. A rule's source matches if any of them, or any AD group they belong to (nested groups included), is listed on the rule.
-- A rule's destinations are alternatives: the request matches if it hits any one of them.
-- Branch DNS doesn't travel through the tunnel; check it with On-prem VA or Network DNS.
-- Tunnel traffic always carries the Network Tunnels identity type, so rules on that type match even when only SD-WAN VPN / security group identities are known. SD-WAN branches show their peer IDs ("LON Campus vMX (Peer ID 140147)"), the name Activity Search uses.
-- Firewall timing: a TCP flow's first packets carry no payload, so when the first rule whose source matches still needs the application, category or a URL-path destination list, the firewall allows the flow under that rule until it identifies the application (Activity Search logs Block and Isolate rules as Allowed this way). The checker shows this as a provisional Allow. UDP flows are classified from the first packet.
-- A domain is checked at DNS and then at Web over HTTPS. A URL uses its own port. An IP address includes the firewall on a tunnel, with the port and protocol you give.
-- Destinations that match a configured private resource, or an internal (RFC 1918 / ULA) address, are evaluated as Private Access. From a tunnel, an internal IP goes through the firewall under the private-access rules.
-- A firewall block stops the later stages ("Not reached"). After a DNS block, Web is still shown as the fallback, because DNS may not know the user.
-- For a domain, the checker asks Cisco Investigate what it is: content categories, security categories (Malware, Phishing, …) and the cloud application (via CASI). Rules on categories, category lists, applications and application lists then resolve without asking anything. Lookups use the dashboard's own session and are cached for the browser session.
-- Only when Investigate can't answer (an IP destination, or the lookup fails, e.g. the Investigate license's rate limit) does the checker ask which of a rule's values apply, or whether the destination is flagged as a threat. **Change** next to Cisco's answer lets you answer yourself.
-- Threats: the DNS default security setting applies before any rule; a matched Allow/Warn/Isolate rule's web security profile can still block a flagged destination at Web.
-- **Show on page** marks each matched rule row on the dashboard with its stages and action, and docks a compact result card while the panel is minimized.
+### 2. Traffic Steering & Exclusion Support
+- **Bypass Secure Access**: Full bypass of both DNS and Web proxy stages for traffic-steered domains.
+- **Bypass Web Proxy**: Preserves DNS policy evaluation while automatically bypassing Web proxy inspection (e.g. for endpoint agent APIs like `api.us-2.crowdstrike.com` and `*halcyon.ai`).
+- **Internal Domains**: Automatically honors organization-configured internal domains and steering lists alongside fallback entries.
 
-Results are predictions from the loaded rules, not observed traffic. Security-profile controls (malware and threat categories, file inspection, tenant controls, IPS) can still block traffic an Allow rule matched, and DNS security settings can block before any rule.
+### 3. Automated Cisco Investigate Intelligence
+- Queries Cisco Investigate using your active dashboard session to classify domains into content categories, threat categories (Malware, Phishing, etc.), and cloud application signatures.
+- Prompts for clarification only when additional destination facts are needed.
+
+### 4. Direct Dashboard Integration
+- **Show on page**: Highlights matching policy rules directly in the dashboard's rule table.
+- **Result Dock**: Docks a compact verdict widget when the checker panel is minimized.
+- **Rules Audit**: Detects shadowed rules, duplicate definitions, and overly permissive catch-all rules.
+
+---
+
+## Understanding Verdicts
+
+- **Allowed**: Connection is permitted through all applicable enforcement points.
+- **Allowed (Bypasses Web Proxy)**: Permitted by DNS policy, while the Web proxy stage is bypassed via Traffic Steering.
+- **Bypassed via Traffic Steering**: Connection completely bypasses Secure Access inspection.
+- **Blocked**: Identifies which enforcement stage (DNS, Web, or Firewall) and rule blocked the connection.
+- **Provisional Allow**: Initial TCP flow allowed while the firewall identifies the application signature.
+
+> *Note*: Verdicts reflect rule configurations. Upstream security profile blocks (file inspection, DLP, tenant controls, IPS) can still apply to observed traffic.
 
 ## QA against Activity Search
 
