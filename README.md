@@ -4,7 +4,15 @@ A Chrome extension that overlays the **Cisco Secure Access** dashboard to analyz
 
 ## Install
 
-1. Clone this repo
+### Option 1: Download ZIP (Recommended)
+1. Download or unzip `cisco-secure-access-policy-checker.zip` (available from the repository releases or root)
+2. Extract the archive into a folder
+3. Open Google Chrome and navigate to `chrome://extensions`
+4. Toggle **Developer mode** on (top right)
+5. Click **Load unpacked** and select the unzipped `extension/` directory
+
+### Option 2: Clone with Git
+1. `git clone https://github.com/technoxi/cisco-secure-access-policy-checker.git`
 2. Open `chrome://extensions` and enable **Developer mode**
 3. Click **Load unpacked** and select the `extension/` directory
 
