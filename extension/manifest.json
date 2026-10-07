@@ -1,0 +1,103 @@
+{
+  "manifest_version": 3,
+  "name": "Secure Access Policy Checker",
+  "version": "0.1.0",
+  "description": "Inline policy linter for Cisco Secure Access",
+  "icons": {
+    "16": "assets/icon-16.png",
+    "48": "assets/icon-48.png",
+    "128": "assets/icon-128.png"
+  },
+  "permissions": [
+    "webRequest",
+    "declarativeNetRequest",
+    "declarativeNetRequestWithHostAccess",
+    "storage",
+    "activeTab",
+    "scripting",
+    "alarms"
+  ],
+  "host_permissions": [
+    "https://api.sse.cisco.com/*",
+    "https://api.umbrella.com/*",
+    "https://management.api.umbrella.com/*",
+    "https://api.opendns.com/*",
+    "https://investigate.umbrella.com/*",
+    "https://api.sse-network-tunnel-mgmt.internal.umbrella.com/*",
+    "https://*.cisco.com/*",
+    "https://*.sse.cisco.com/*",
+    "https://dashboard.sse.cisco.com/*",
+    "https://api.anthropic.com/*",
+    "https://api.openai.com/*",
+    "https://generativelanguage.googleapis.com/*",
+    "https://streaming.assemblyai.com/*"
+  ],
+  "optional_host_permissions": ["https://*/*"],
+  "background": {
+    "service_worker": "background/service-worker.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.cisco.com/*",
+        "https://*.sse.cisco.com/*",
+        "https://dashboard.sse.cisco.com/*"
+      ],
+      "js": ["content/content-script.js"],
+      "css": ["content/styles.css"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://*.cisco.com/*",
+        "https://*.sse.cisco.com/*",
+        "https://dashboard.sse.cisco.com/*"
+      ],
+      "js": ["content/token-sniffer.js"],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "https://*.cisco.com/*",
+        "https://*.sse.cisco.com/*",
+        "https://dashboard.sse.cisco.com/*"
+      ],
+      "js": ["content/token-relay.js"],
+      "run_at": "document_start",
+      "world": "ISOLATED"
+    }
+  ],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "assets/icon-16.png",
+      "48": "assets/icon-48.png",
+      "128": "assets/icon-128.png"
+    }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "popup/popup.html",
+        "popup/matcher.js",
+        "popup/popup-sections.js",
+        "popup/popup.js",
+        "lib/debug-log.js",
+        "assets/icon-16.png",
+        "assets/icon-48.png",
+        "assets/icon-128.png",
+        "data/categories-lookup.json",
+        "data/apps-lookup.json",
+        "data/protocols-lookup.json",
+        "data/security-categories-lookup.json",
+        "data/exclusions-lookup.json"
+      ],
+      "matches": [
+        "https://*.cisco.com/*",
+        "https://*.sse.cisco.com/*",
+        "https://dashboard.sse.cisco.com/*"
+      ]
+    }
+  ]
+}

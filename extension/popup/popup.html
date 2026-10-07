@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Secure Access Policy Checker</title>
+    <link rel="stylesheet" href="traffic-path.css" />
+    <style>
+      /* ==================================================================== */
+      /* Legacy --hbr-* aliases onto the --ds-* tokens in traffic-path.css   */
+      /* ==================================================================== */
+      :root {
+        --hbr-font-family: var(--ds-font);
+        --hbr-font-mono: var(--ds-font);
+
+        --hbr-radius-sm: var(--ds-radius-sm);
+        --hbr-radius-md: var(--ds-radius-md);
+        --hbr-radius-lg: var(--ds-radius-lg);
+        --hbr-radius-pill: var(--ds-radius-pill);
+        --hbr-border-width: 1px;
+
+        --hbr-space-xs: var(--ds-space-1);
+        --hbr-space-sm: var(--ds-space-2);
+        --hbr-space-md: var(--ds-space-3);
+        --hbr-space-lg: var(--ds-space-4);
+
+        --hbr-color-bg-page: var(--ds-surface);
+        --hbr-color-bg-card: var(--ds-surface-subtle);
+        --hbr-color-bg-subtle: var(--ds-surface-sunken);
+        --hbr-color-text-body: var(--ds-text);
+        --hbr-color-text-heading: var(--ds-text-strong);
+        --hbr-color-text-weak: var(--ds-text-muted);
+        --hbr-color-border: var(--ds-border);
+
+        --hbr-color-accent: var(--ds-accent-600);
+        --hbr-color-accent-hover: var(--ds-accent-700);
+        --hbr-color-accent-light: var(--ds-accent-50);
+        --hbr-color-header: var(--ds-surface);
+      }
+
+      *, *::before, *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html, body {
+        width: 100% !important;
+        max-width: 100vw !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow-x: hidden !important;
+        box-sizing: border-box !important;
+      }
+
+      body {
+        font-family: var(--ds-font);
+        font-weight: var(--ds-weight-regular);
+        background: var(--ds-surface);
+        color: var(--ds-text);
+        font-size: var(--ds-text-sm);
+        line-height: var(--ds-leading-normal);
+        letter-spacing: var(--ds-tracking-tight);
+        min-height: 300px;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      body.sec-embedded {
+        background: transparent;
+      }
+
+      /* ------------------------------------------------------------------ */
+      /* Header bar                                                         */
+      /* ------------------------------------------------------------------ */
+      .toolbar {
+        background: var(--ds-surface);
+        display: flex;
+        align-items: center;
+        padding: 0 var(--ds-space-2) 0 var(--ds-space-4);
+        height: 48px;
+        gap: var(--ds-space-2);
+        width: 100%;
+        max-width: 100vw;
+        box-sizing: border-box;
+      }
+      .toolbar-logo {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        width: 28px;
+        height: 28px;
+        border-radius: var(--ds-radius-md);
+        background: var(--ds-accent-600);
+        box-shadow: var(--ds-shadow-sm), inset 0 1px 0 rgba(255, 255, 255, .14);
+      }
+      .toolbar-logo svg { width: 18px; height: 18px; }
+      .toolbar-logo svg path:first-child { fill: transparent; stroke: #ffffff; }
+      .toolbar-title {
+        color: var(--ds-text-strong);
+        font-size: var(--ds-text-lg);
+        font-weight: var(--ds-weight-bold);
+        letter-spacing: -0.015em;
+        flex: 1;
+        font-family: var(--hbr-font-family);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .toolbar-close {
+        display: inline-grid;
+        place-items: center;
+        width: 28px;
+        height: 28px;
+        background: transparent;
+        border: 0;
+        color: var(--ds-text-secondary);
+        font-size: 15px;
+        cursor: pointer;
+        border-radius: var(--ds-radius-md);
+        line-height: 1;
+        transition: background-color var(--ds-dur-fast), color var(--ds-dur-fast);
+        flex-shrink: 0;
+      }
+      .toolbar-close:hover {
+        background: var(--ds-surface-sunken);
+        color: var(--ds-text-strong);
+      }
+      .toolbar-close:focus-visible { outline: 2px solid var(--ds-focus); outline-offset: 2px; }
+
+      /* ------------------------------------------------------------------ */
+      /* Error Banner                                                       */
+      /* ------------------------------------------------------------------ */
+      #error-banner {
+        display: none;
+        background: var(--ds-block-soft);
+        color: var(--ds-block-strong);
+        padding: var(--ds-space-2) var(--ds-space-4);
+        font-size: var(--ds-text-sm);
+        border-top: 1px solid var(--ds-block-line);
+        border-bottom: 1px solid var(--ds-block-line);
+        box-shadow: inset 3px 0 0 var(--ds-block-fg);
+        align-items: center;
+        gap: var(--ds-space-3);
+        font-family: var(--ds-font);
+      }
+      #psc-retry-btn {
+        background: var(--ds-surface);
+        color: var(--ds-block-strong);
+        border: 1px solid var(--ds-block-line);
+        border-radius: var(--ds-radius-md);
+        min-height: 28px;
+        padding: var(--ds-space-1) var(--ds-space-3);
+        font-size: var(--ds-text-sm);
+        font-weight: var(--ds-weight-semibold);
+        cursor: pointer;
+        font-family: var(--ds-font);
+        flex-shrink: 0;
+        transition: border-color var(--ds-dur-fast), background-color var(--ds-dur-fast);
+      }
+      #psc-retry-btn:hover { border-color: var(--ds-block-fg); background: var(--ds-neutral-25); }
+      #psc-retry-btn:focus-visible { outline: 2px solid var(--ds-focus); outline-offset: 2px; }
+
+      /* ------------------------------------------------------------------ */
+      /* Tabs                                                               */
+      /* ------------------------------------------------------------------ */
+      .tabs {
+        display: flex;
+        background: var(--ds-surface);
+        border-bottom: 1px solid var(--ds-border);
+        padding: 0 var(--ds-space-4);
+        gap: var(--ds-space-5);
+        width: 100%;
+        max-width: 100vw;
+        box-sizing: border-box;
+      }
+      [hidden] { display: none !important; }
+      .tab-btn {
+        background: none;
+        border: none;
+        margin-bottom: -1px;
+        padding: var(--ds-space-2) var(--ds-space-0-5) 9px;
+        font-family: var(--ds-font);
+        font-size: var(--ds-text-sm);
+        font-weight: 400;
+        color: var(--ds-text-secondary);
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        transition: color var(--ds-dur) var(--ds-ease), border-color var(--ds-dur) var(--ds-ease);
+        font-family: var(--ds-font);
+        letter-spacing: -0.01em;
+      }
+      .tab-btn:focus-visible { outline: 2px solid var(--ds-focus); outline-offset: -2px; border-radius: var(--ds-radius-sm); }
+      .tab-btn:hover {
+        color: var(--ds-text-strong);
+        border-bottom-color: var(--ds-border-strong);
+      }
+      .tab-btn.active {
+        color: var(--ds-accent-700);
+        border-bottom-color: var(--ds-accent-600);
+      }
+
+      /* ------------------------------------------------------------------ */
+      /* Tab Contents                                                       */
+      /* ------------------------------------------------------------------ */
+      .tab-content {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+        max-width: 100vw;
+        overflow-x: hidden !important;
+        box-sizing: border-box;
+      }
+      .tab-content.active {
+        display: flex;
+      }
+
+      /* ------------------------------------------------------------------ */
+      /* Skeleton loading                                                   */
+      /* ------------------------------------------------------------------ */
+      @keyframes psc-skeleton-shimmer {
+        0%   { background-position: -400px 0; }
+        100% { background-position: 400px 0; }
+      }
+      .psc-rules-stalled {
+        display: flex; flex-direction: column; align-items: flex-start; gap: 8px;
+        margin: var(--ds-space-3) var(--ds-space-4); padding: var(--ds-space-3); border: 1px solid var(--ds-pending-line);
+        border-radius: var(--ds-radius-lg); box-shadow: inset 3px 0 0 var(--ds-pending-fg);
+        background: var(--ds-pending-soft); color: var(--ds-pending-strong); font-size: var(--ds-text-sm); line-height: var(--ds-leading-normal);
+      }
+      .psc-rules-stalled strong { color: var(--ds-pending-strong); font-size: var(--ds-text-md); }
+      .psc-rules-stalled p { margin: 0; color: var(--ds-text-secondary); }
+      .psc-rules-stalled button {
+        min-height: 30px; padding: var(--ds-space-1) var(--ds-space-3); border: 1px solid var(--ds-accent-600); border-radius: var(--ds-radius-md);
+        background: var(--ds-accent-600); color: #fff; font: var(--ds-weight-semibold) var(--ds-text-sm) var(--ds-font); cursor: pointer;
+      }
+      .psc-rules-stalled button:hover { background: var(--ds-accent-700); }
+      .psc-rules-stalled button:focus-visible { outline: 2px solid var(--ds-focus); outline-offset: 2px; }
+      .psc-skeleton {
+        padding: 20px;
+      }
+      .psc-skeleton-line,
+      .psc-skeleton-block {
+        background: linear-gradient(90deg, var(--ds-neutral-100) 25%, var(--ds-neutral-150) 37%, var(--ds-neutral-100) 63%);
+        background-size: 800px 100%;
+        animation: psc-skeleton-shimmer 1.6s ease-in-out infinite;
+        border-radius: var(--ds-radius-sm);
+      }
+      .psc-skeleton-block { border-radius: var(--ds-radius-lg); }
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; }
+      }
+      .psc-skeleton-line { height: 10px; margin-bottom: 12px; }
+      .psc-skeleton-line.psc-skeleton-title { height: 14px; width: 40%; margin-bottom: 16px; }
+      .psc-skeleton-line.medium { width: 65%; }
+      .psc-skeleton-line.long { width: 88%; }
+      .psc-skeleton-row { display: flex; gap: 14px; margin-top: 18px; }
+      .psc-skeleton-block { flex: 1 1 0; min-width: 0; height: 140px; }
+    </style>
+  </head>
+  <body>
+
+    <!-- Top toolbar -->
+    <div class="toolbar">
+      <span class="toolbar-logo">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L3 6V11.5C3 16.8 6.8 21.5 12 22.8C17.2 21.5 21 16.8 21 11.5V6L12 2Z" fill="#0F172A" stroke="#0F172A" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M8.5 12L11 14.5L16 9.5" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <span class="toolbar-title">Policy Checker</span>
+      <button id="toolbar-close" class="toolbar-close" title="Close Panel">✕</button>
+    </div>
+
+    <!-- Error Banner -->
+    <div id="error-banner"></div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" data-target="tab-tester">Check a request</button>
+      <button class="tab-btn" data-target="tab-rules" hidden>Rules &amp; audit</button>
+    </div>
+
+    <!-- Tab Contents -->
+    <div id="tab-tester" class="tab-content active">
+      <div id="tester-root"></div>
+    </div>
+
+    <div id="tab-rules" class="tab-content" hidden>
+      <div id="rules-root"></div>
+    </div>
+
+    <!-- Script load order matters -->
+    <script src="ip-address.js"></script>
+    <script src="matcher.js"></script>
+    <script src="traffic-path.js"></script>
+    <script src="llm-providers.js"></script>
+    <script src="speech-providers.js"></script>
+    <script src="describe-agent.js"></script>
+    <script src="describe-panel.js"></script>
+    <script src="traffic-path-panel.js"></script>
+    <script src="popup-sections.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>

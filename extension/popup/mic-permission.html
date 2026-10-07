@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Allow microphone · Secure Access Policy Checker</title>
+    <style>
+      body { margin: 0; display: grid; place-items: center; min-height: 100vh; font: 14px/1.5 Inter, -apple-system, "Segoe UI", Roboto, sans-serif; color: #1e293b; background: #f8fafc; }
+      main { max-width: 420px; padding: 28px; border: 1px solid #e2e8f0; border-radius: 6px; background: #fff; }
+      h1 { margin: 0 0 8px; font-size: 17px; color: #0f172a; }
+      p { margin: 0 0 16px; color: #475569; }
+      button { min-height: 34px; padding: 6px 16px; border: 0; border-radius: 3px; background: #0f172a; color: #fff; font: 600 13px inherit; cursor: pointer; }
+      #status { margin: 14px 0 0; font-weight: 600; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Allow voice input</h1>
+      <p>Chrome asks once for the policy checker to use your microphone. After you allow it, close this tab and press Speak in Describe mode again.</p>
+      <button id="allow" type="button">Allow microphone</button>
+      <p id="status" role="status"></p>
+    </main>
+    <script src="mic-permission.js"></script>
+  </body>
+</html>

@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Policy checker UI test fixture</title>
+  <link rel="stylesheet" href="../extension/popup/traffic-path.css">
+  <style>
+    body { margin: 0; background: #fff; color: #0f172a; font: 13px system-ui, sans-serif; }
+    main { max-width: 680px; margin: 0 auto; }
+    h1 { margin: 0; padding: 10px 14px 4px; font: 400 13px/1.4 var(--ds-font, Inter, system-ui, sans-serif); }
+  </style>
+</head>
+<body>
+  <main><h1>Check a request</h1><div id="checker"></div></main>
+  <script src="../extension/popup/ip-address.js"></script>
+  <script src="../extension/popup/matcher.js"></script>
+  <script src="../extension/popup/traffic-path.js"></script>
+  <script src="../extension/popup/llm-providers.js"></script>
+  <script src="../extension/popup/speech-providers.js"></script>
+  <script src="../extension/popup/describe-agent.js"></script>
+  <script src="../extension/popup/describe-panel.js"></script>
+  <script src="ui-describe-stub.js"></script>
+  <script src="../extension/popup/traffic-path-panel.js"></script>
+  <script src="ui-checker.js"></script>
+</body>
+</html>
