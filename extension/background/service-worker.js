@@ -2783,19 +2783,28 @@ async function resolveExclusions(orgId, tabId) {
   try {
     const sseTokenObj = await getFreshToken("sse_token", tabId);
     if (sseTokenObj) {
-      const response = await fetch("https://api.sse.cisco.com/deployments/v2/internaldomains", {
-        headers: {
-          Authorization: `Bearer ${sseTokenObj.token}`,
-          Accept: "application/json",
-          Origin: "https://dashboard.sse.cisco.com",
-          Referer: "https://dashboard.sse.cisco.com/",
-        },
-      });
-      if (response.ok) {
+      let pageNum = 1;
+      const seenDomainKeys = new Set();
+      while (pageNum <= 50) {
+        const response = await fetch(`https://api.sse.cisco.com/deployments/v2/internaldomains?page=${pageNum}&limit=100`, {
+          headers: {
+            Authorization: `Bearer ${sseTokenObj.token}`,
+            Accept: "application/json",
+            Origin: "https://dashboard.sse.cisco.com",
+            Referer: "https://dashboard.sse.cisco.com/",
+          },
+        });
+        if (!response.ok) break;
         const json = await response.json();
         const items = Array.isArray(json) ? json : (json?.data || json?.results || json?.items || []);
+        if (!items.length) break;
+        let newItemsOnPage = 0;
         for (const item of items) {
           if (!item || !(item.domain || item.name)) continue;
+          const key = String(item.id || item.domain || item.name).toLowerCase();
+          if (seenDomainKeys.has(key)) continue;
+          seenDomainKeys.add(key);
+          newItemsOnPage++;
           let appliesTo = "All Devices, All Sites";
           if (item.type) {
             const hasVa = !!item.type.va;
@@ -2813,6 +2822,8 @@ async function resolveExclusions(orgId, tabId) {
             appliesTo,
           });
         }
+        if (newItemsOnPage === 0 || items.length < 100 || (json?.meta?.total && liveItems.length >= json.meta.total)) break;
+        pageNum++;
       }
     }
   } catch (err) {
@@ -2823,19 +2834,28 @@ async function resolveExclusions(orgId, tabId) {
     try {
       const openDnsTokenObj = await getFreshToken("opendns_token", tabId);
       if (openDnsTokenObj && orgId) {
-        const response = await fetch(`https://api.opendns.com/v3/organizations/${orgId}/internaldomains?filters={"includeGlobal":false}`, {
-          headers: {
-            Authorization: `Bearer ${openDnsTokenObj.token}`,
-            Accept: "application/json",
-            Origin: "https://dashboard.sse.cisco.com",
-            Referer: "https://dashboard.sse.cisco.com/",
-          },
-        });
-        if (response.ok) {
+        let pageNum = 1;
+        const seenOpenDns = new Set();
+        while (pageNum <= 50) {
+          const response = await fetch(`https://api.opendns.com/v3/organizations/${orgId}/internaldomains?filters={"includeGlobal":false}&page=${pageNum}&limit=100`, {
+            headers: {
+              Authorization: `Bearer ${openDnsTokenObj.token}`,
+              Accept: "application/json",
+              Origin: "https://dashboard.sse.cisco.com",
+              Referer: "https://dashboard.sse.cisco.com/",
+            },
+          });
+          if (!response.ok) break;
           const json = await response.json();
           const items = Array.isArray(json) ? json : [];
+          if (!items.length) break;
+          let added = 0;
           for (const item of items) {
             if (!item || !item.domain) continue;
+            const key = String(item.id || item.domain).toLowerCase();
+            if (seenOpenDns.has(key)) continue;
+            seenOpenDns.add(key);
+            added++;
             liveItems.push({
               id: item.id ? String(item.id) : `int-${liveItems.length}`,
               domain: item.domain,
@@ -2844,6 +2864,8 @@ async function resolveExclusions(orgId, tabId) {
               appliesTo: "All Devices, All Sites",
             });
           }
+          if (added === 0 || items.length < 100) break;
+          pageNum++;
         }
       }
     } catch (_) {}
@@ -2860,12 +2882,21 @@ async function resolveExclusions(orgId, tabId) {
       };
 
       try {
-        const domResp = await fetch(`https://management.api.umbrella.com/api/v1/organizations/${orgId}/domains`, { headers });
-        if (domResp.ok) {
+        let pageNum = 1;
+        const seenExtDomains = new Set();
+        while (pageNum <= 50) {
+          const domResp = await fetch(`https://management.api.umbrella.com/api/v1/organizations/${orgId}/domains?page=${pageNum}&limit=100`, { headers });
+          if (!domResp.ok) break;
           const json = await domResp.json();
           const list = Array.isArray(json) ? json : (json?.data || []);
+          if (!list.length) break;
+          let added = 0;
           for (const item of list) {
             if (!item || !item.domain) continue;
+            const key = String(item.id || item.domain).toLowerCase();
+            if (seenExtDomains.has(key)) continue;
+            seenExtDomains.add(key);
+            added++;
             liveItems.push({
               id: item.id ? String(item.id) : `ext-dom-${liveItems.length}`,
               domain: item.domain,
@@ -2874,16 +2905,27 @@ async function resolveExclusions(orgId, tabId) {
               appliesTo: "Hosted PAC, AnyConnect",
             });
           }
+          if (added === 0 || list.length < 100 || (json?.total && seenExtDomains.size >= json.total)) break;
+          pageNum++;
         }
       } catch (_) {}
 
       try {
-        const ipResp = await fetch(`https://management.api.umbrella.com/api/v1/organizations/${orgId}/ips`, { headers });
-        if (ipResp.ok) {
+        let pageNum = 1;
+        const seenExtIps = new Set();
+        while (pageNum <= 50) {
+          const ipResp = await fetch(`https://management.api.umbrella.com/api/v1/organizations/${orgId}/ips?page=${pageNum}&limit=100`, { headers });
+          if (!ipResp.ok) break;
           const json = await ipResp.json();
           const list = (json?.data?.ips) || (Array.isArray(json?.data) ? json.data : []) || [];
+          if (!list.length) break;
+          let added = 0;
           for (const item of list) {
             if (!item || !item.ip) continue;
+            const key = String(item.id || item.ip).toLowerCase();
+            if (seenExtIps.has(key)) continue;
+            seenExtIps.add(key);
+            added++;
             liveItems.push({
               id: item.id ? String(item.id) : `ext-ip-${liveItems.length}`,
               domain: item.ip,
@@ -2892,6 +2934,8 @@ async function resolveExclusions(orgId, tabId) {
               appliesTo: "AnyConnect",
             });
           }
+          if (added === 0 || list.length < 100) break;
+          pageNum++;
         }
       } catch (_) {}
     }
