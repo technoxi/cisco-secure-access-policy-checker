@@ -1,0 +1,618 @@
+{
+  "0": {
+    "name": "Adware",
+    "categoryId": 1
+  },
+  "1": {
+    "name": "Alcohol",
+    "categoryId": 2
+  },
+  "2": {
+    "name": "Auctions",
+    "categoryId": 3
+  },
+  "3": {
+    "name": "Blogs",
+    "categoryId": 4
+  },
+  "4": {
+    "name": "Chat",
+    "categoryId": 5
+  },
+  "5": {
+    "name": "Classifieds",
+    "categoryId": 6
+  },
+  "6": {
+    "name": "Dating",
+    "categoryId": 7
+  },
+  "7": {
+    "name": "Drugs",
+    "categoryId": 8
+  },
+  "8": {
+    "name": "Ecommerce/Shopping",
+    "categoryId": 9
+  },
+  "9": {
+    "name": "File Storage",
+    "categoryId": 10
+  },
+  "10": {
+    "name": "Gambling",
+    "categoryId": 11
+  },
+  "11": {
+    "name": "Games",
+    "categoryId": 12
+  },
+  "12": {
+    "name": "Hate/Discrimination",
+    "categoryId": 13
+  },
+  "13": {
+    "name": "Health and Fitness",
+    "categoryId": 14
+  },
+  "14": {
+    "name": "Humor",
+    "categoryId": 15
+  },
+  "15": {
+    "name": "Instant Messaging",
+    "categoryId": 16
+  },
+  "16": {
+    "name": "Jobs/Employment",
+    "categoryId": 17
+  },
+  "17": {
+    "name": "Movies",
+    "categoryId": 19
+  },
+  "18": {
+    "name": "News/Media",
+    "categoryId": 33
+  },
+  "19": {
+    "name": "P2P/File sharing",
+    "categoryId": 20
+  },
+  "20": {
+    "name": "Photo Sharing",
+    "categoryId": 48
+  },
+  "21": {
+    "name": "Portals",
+    "categoryId": 21
+  },
+  "22": {
+    "name": "Radio",
+    "categoryId": 22
+  },
+  "23": {
+    "name": "Search Engines",
+    "categoryId": 23
+  },
+  "24": {
+    "name": "Social Networking",
+    "categoryId": 24
+  },
+  "25": {
+    "name": "Software/Technology",
+    "categoryId": 47
+  },
+  "26": {
+    "name": "Television",
+    "categoryId": 34
+  },
+  "27": {
+    "name": "Advertisements",
+    "categoryId": 414
+  },
+  "28": {
+    "name": "Video Sharing",
+    "categoryId": 26
+  },
+  "29": {
+    "name": "Visual Search Engines",
+    "categoryId": 27
+  },
+  "30": {
+    "name": "Weapons",
+    "categoryId": 28
+  },
+  "31": {
+    "name": "Webmail",
+    "categoryId": 29
+  },
+  "32": {
+    "name": "Business Services",
+    "categoryId": 56
+  },
+  "33": {
+    "name": "Educational Institutions",
+    "categoryId": 52
+  },
+  "34": {
+    "name": "Financial Institutions",
+    "categoryId": 55
+  },
+  "35": {
+    "name": "Government",
+    "categoryId": 49
+  },
+  "36": {
+    "name": "Music",
+    "categoryId": 50
+  },
+  "37": {
+    "name": "Parked Domains",
+    "categoryId": 57
+  },
+  "38": {
+    "name": "Tobacco",
+    "categoryId": 73
+  },
+  "39": {
+    "name": "Sports",
+    "categoryId": 51
+  },
+  "40": {
+    "name": "Adult Themes",
+    "categoryId": 58
+  },
+  "41": {
+    "name": "Lingerie/Bikini",
+    "categoryId": 60
+  },
+  "42": {
+    "name": "Nudity",
+    "categoryId": 63
+  },
+  "43": {
+    "name": "Proxy/Anonymizer",
+    "categoryId": 61
+  },
+  "44": {
+    "name": "Pornography",
+    "categoryId": 64
+  },
+  "45": {
+    "name": "Sexuality",
+    "categoryId": 62
+  },
+  "46": {
+    "name": "Tasteless",
+    "categoryId": 59
+  },
+  "47": {
+    "name": "Academic Fraud",
+    "categoryId": 72
+  },
+  "48": {
+    "name": "Automotive",
+    "categoryId": 70
+  },
+  "49": {
+    "name": "Forums/Message boards",
+    "categoryId": 67
+  },
+  "50": {
+    "name": "Non-Profits",
+    "categoryId": 69
+  },
+  "51": {
+    "name": "Podcasts",
+    "categoryId": 71
+  },
+  "52": {
+    "name": "Politics",
+    "categoryId": 66
+  },
+  "53": {
+    "name": "Religious",
+    "categoryId": 65
+  },
+  "54": {
+    "name": "Research/Reference",
+    "categoryId": 54
+  },
+  "55": {
+    "name": "Travel",
+    "categoryId": 68
+  },
+  "56": {
+    "name": "German Youth Protection",
+    "categoryId": 74
+  },
+  "57": {
+    "name": "Anime/Manga/Webcomic",
+    "categoryId": 76
+  },
+  "58": {
+    "name": "Web Spam",
+    "categoryId": 77
+  },
+  "85": {
+    "name": "Internet Watch Foundation",
+    "categoryId": 126
+  },
+  "107": {
+    "name": "URL Shorteners",
+    "categoryId": 170
+  },
+  "111": {
+    "name": "Arts",
+    "categoryId": 327
+  },
+  "112": {
+    "name": "Astrology",
+    "categoryId": 329
+  },
+  "113": {
+    "name": "Computer Security",
+    "categoryId": 331
+  },
+  "114": {
+    "name": "Digital Postcards",
+    "categoryId": 333
+  },
+  "115": {
+    "name": "Dining and Drinking",
+    "categoryId": 335
+  },
+  "116": {
+    "name": "Dynamic and Residential",
+    "categoryId": 337
+  },
+  "117": {
+    "name": "Fashion",
+    "categoryId": 339
+  },
+  "118": {
+    "name": "File Transfer Services",
+    "categoryId": 341
+  },
+  "119": {
+    "name": "Freeware and Shareware",
+    "categoryId": 343
+  },
+  "120": {
+    "name": "Hacking",
+    "categoryId": 345
+  },
+  "121": {
+    "name": "Illegal Activities",
+    "categoryId": 347
+  },
+  "122": {
+    "name": "Illegal Downloads",
+    "categoryId": 349
+  },
+  "123": {
+    "name": "Infrastructure and Content Delivery Networks",
+    "categoryId": 351
+  },
+  "124": {
+    "name": "Internet Telephony",
+    "categoryId": 353
+  },
+  "125": {
+    "name": "Lotteries",
+    "categoryId": 355
+  },
+  "126": {
+    "name": "Mobile Phones",
+    "categoryId": 357
+  },
+  "127": {
+    "name": "Nature and Conservation",
+    "categoryId": 359
+  },
+  "128": {
+    "name": "Online Trading",
+    "categoryId": 361
+  },
+  "129": {
+    "name": "Personal Sites",
+    "categoryId": 363
+  },
+  "130": {
+    "name": "Professional Networking",
+    "categoryId": 365
+  },
+  "131": {
+    "name": "Real Estate",
+    "categoryId": 367
+  },
+  "132": {
+    "name": "SaaS and B2B",
+    "categoryId": 369
+  },
+  "133": {
+    "name": "Safe for Kids",
+    "categoryId": 371
+  },
+  "134": {
+    "name": "Science and Technology",
+    "categoryId": 373
+  },
+  "135": {
+    "name": "Sex Education",
+    "categoryId": 375
+  },
+  "136": {
+    "name": "Social Science",
+    "categoryId": 377
+  },
+  "137": {
+    "name": "Society and Culture",
+    "categoryId": 379
+  },
+  "138": {
+    "name": "Software Updates",
+    "categoryId": 381
+  },
+  "139": {
+    "name": "Web Hosting",
+    "categoryId": 383
+  },
+  "140": {
+    "name": "Web Page Translation",
+    "categoryId": 385
+  },
+  "141": {
+    "name": "Organizational Email",
+    "categoryId": 387
+  },
+  "142": {
+    "name": "Online Meetings",
+    "categoryId": 389
+  },
+  "143": {
+    "name": "Paranormal",
+    "categoryId": 391
+  },
+  "144": {
+    "name": "Personal VPN",
+    "categoryId": 393
+  },
+  "145": {
+    "name": "DIY Projects",
+    "categoryId": 395
+  },
+  "146": {
+    "name": "Hunting",
+    "categoryId": 397
+  },
+  "147": {
+    "name": "Military",
+    "categoryId": 399
+  },
+  "149": {
+    "name": "Terrorism",
+    "categoryId": 401
+  },
+  "156": {
+    "name": "IT-AGCOM",
+    "categoryId": 410
+  },
+  "157": {
+    "name": "IT-ADM",
+    "categoryId": 412
+  },
+  "160": {
+    "name": "Uncategorized",
+    "categoryId": 30
+  },
+  "161": {
+    "name": "Adult",
+    "categoryId": 415
+  },
+  "162": {
+    "name": "Web-based Email",
+    "categoryId": 416
+  },
+  "163": {
+    "name": "Business and Industry",
+    "categoryId": 417
+  },
+  "164": {
+    "name": "Chat and Instant Messaging",
+    "categoryId": 418
+  },
+  "165": {
+    "name": "Cheating and Plagiarism",
+    "categoryId": 419
+  },
+  "166": {
+    "name": "Child Abuse Content",
+    "categoryId": 420
+  },
+  "167": {
+    "name": "Computers and Internet",
+    "categoryId": 421
+  },
+  "168": {
+    "name": "Education",
+    "categoryId": 422
+  },
+  "169": {
+    "name": "Entertainment",
+    "categoryId": 423
+  },
+  "170": {
+    "name": "Extreme",
+    "categoryId": 424
+  },
+  "171": {
+    "name": "Filter Avoidance",
+    "categoryId": 425
+  },
+  "172": {
+    "name": "Finance",
+    "categoryId": 426
+  },
+  "173": {
+    "name": "Government and Law",
+    "categoryId": 427
+  },
+  "174": {
+    "name": "Hate Speech",
+    "categoryId": 428
+  },
+  "175": {
+    "name": "Health and Medicine",
+    "categoryId": 429
+  },
+  "176": {
+    "name": "Illegal Drugs",
+    "categoryId": 430
+  },
+  "177": {
+    "name": "Job Search",
+    "categoryId": 431
+  },
+  "178": {
+    "name": "Lingerie and Swimsuits",
+    "categoryId": 432
+  },
+  "179": {
+    "name": "News",
+    "categoryId": 433
+  },
+  "180": {
+    "name": "Non-governmental Organizations",
+    "categoryId": 434
+  },
+  "181": {
+    "name": "Non-sexual Nudity",
+    "categoryId": 435
+  },
+  "182": {
+    "name": "Not Actionable",
+    "categoryId": 458
+  },
+  "183": {
+    "name": "Online Communities",
+    "categoryId": 437
+  },
+  "184": {
+    "name": "Online Storage and Backup",
+    "categoryId": 438
+  },
+  "185": {
+    "name": "Web Cache and Archives",
+    "categoryId": 467
+  },
+  "186": {
+    "name": "Peer File Transfer",
+    "categoryId": 440
+  },
+  "187": {
+    "name": "Photo Search and Images",
+    "categoryId": 441
+  },
+  "188": {
+    "name": "Reference",
+    "categoryId": 442
+  },
+  "189": {
+    "name": "Religion",
+    "categoryId": 443
+  },
+  "190": {
+    "name": "Search Engines and Portals",
+    "categoryId": 444
+  },
+  "191": {
+    "name": "Shopping",
+    "categoryId": 445
+  },
+  "192": {
+    "name": "Sports and Recreation",
+    "categoryId": 446
+  },
+  "193": {
+    "name": "Streaming Audio",
+    "categoryId": 447
+  },
+  "194": {
+    "name": "Streaming Video",
+    "categoryId": 448
+  },
+  "195": {
+    "name": "Transportation",
+    "categoryId": 449
+  },
+  "196": {
+    "name": "Animals and Pets",
+    "categoryId": 450
+  },
+  "197": {
+    "name": "Cannabis",
+    "categoryId": 451
+  },
+  "198": {
+    "name": "Cloud and Data Centers",
+    "categoryId": 452
+  },
+  "199": {
+    "name": "Conventions, Conferences and Trade Shows",
+    "categoryId": 453
+  },
+  "200": {
+    "name": "Cryptocurrency",
+    "categoryId": 454
+  },
+  "201": {
+    "name": "Encrypted DNS",
+    "categoryId": 455
+  },
+  "202": {
+    "name": "Internet of Things",
+    "categoryId": 456
+  },
+  "203": {
+    "name": "Museums",
+    "categoryId": 457
+  },
+  "204": {
+    "name": "Terrorism and Violent Extremism",
+    "categoryId": 466
+  },
+  "205": {
+    "name": "Online Document Sharing and Collaboration",
+    "categoryId": 459
+  },
+  "206": {
+    "name": "Private IP Addresses as Host",
+    "categoryId": 460
+  },
+  "207": {
+    "name": "Recipes and Food",
+    "categoryId": 461
+  },
+  "208": {
+    "name": "Regional Restricted Sites (Germany)",
+    "categoryId": 462
+  },
+  "209": {
+    "name": "Regional Restricted Sites (Great Britain)",
+    "categoryId": 463
+  },
+  "210": {
+    "name": "Regional Restricted Sites (Italy)",
+    "categoryId": 464
+  },
+  "211": {
+    "name": "Regional Restricted Sites (Poland)",
+    "categoryId": 465
+  },
+  "212": {
+    "name": "Generative AI",
+    "categoryId": 469
+  }
+}

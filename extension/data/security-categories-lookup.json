@@ -1,0 +1,182 @@
+{
+  "60": {
+    "name": "Drive-by Downloads/Exploits",
+    "categoryId": 83
+  },
+  "61": {
+    "name": "Dynamic DNS",
+    "categoryId": 85
+  },
+  "62": {
+    "name": "Mobile Threats",
+    "categoryId": 87
+  },
+  "63": {
+    "name": "High Risk Sites and Locations",
+    "categoryId": 89
+  },
+  "64": {
+    "name": "Command and Control",
+    "categoryId": 90
+  },
+  "65": {
+    "name": "Command and Control",
+    "categoryId": 92
+  },
+  "66": {
+    "name": "Malware",
+    "categoryId": 94
+  },
+  "67": {
+    "name": "Malware",
+    "categoryId": 96
+  },
+  "68": {
+    "name": "Phishing",
+    "categoryId": 98
+  },
+  "69": {
+    "name": "Suspicious Response",
+    "categoryId": 100
+  },
+  "70": {
+    "name": "FireEye",
+    "categoryId": 102
+  },
+  "76": {
+    "name": "Check Point",
+    "categoryId": 104
+  },
+  "77": {
+    "name": "Cyphort",
+    "categoryId": 106
+  },
+  "78": {
+    "name": "CounterTack",
+    "categoryId": 108
+  },
+  "79": {
+    "name": "ZeroFox",
+    "categoryId": 110
+  },
+  "80": {
+    "name": "XTO",
+    "categoryId": 117
+  },
+  "81": {
+    "name": "BP",
+    "categoryId": 119
+  },
+  "82": {
+    "name": "ThreatQ",
+    "categoryId": 121
+  },
+  "83": {
+    "name": "Y",
+    "categoryId": 123
+  },
+  "84": {
+    "name": "ThreatConnect",
+    "categoryId": 125
+  },
+  "86": {
+    "name": "Custom Integration 6",
+    "categoryId": 127
+  },
+  "87": {
+    "name": "Custom Integration 7",
+    "categoryId": 129
+  },
+  "88": {
+    "name": "Custom Integration 8",
+    "categoryId": 131
+  },
+  "89": {
+    "name": "Custom Integration 9",
+    "categoryId": 133
+  },
+  "90": {
+    "name": "Custom Integration 10",
+    "categoryId": 135
+  },
+  "91": {
+    "name": "Custom Integration 1",
+    "categoryId": 137
+  },
+  "92": {
+    "name": "Custom Integration 2",
+    "categoryId": 139
+  },
+  "93": {
+    "name": "Custom Integration 3",
+    "categoryId": 141
+  },
+  "94": {
+    "name": "Custom Integration 4",
+    "categoryId": 143
+  },
+  "95": {
+    "name": "Custom Integration 5",
+    "categoryId": 145
+  },
+  "96": {
+    "name": "Cisco AMP Threat Grid",
+    "categoryId": 147
+  },
+  "97": {
+    "name": "Partner Integration 7",
+    "categoryId": 149
+  },
+  "98": {
+    "name": "Partner Integration 8",
+    "categoryId": 151
+  },
+  "99": {
+    "name": "Partner Integration 9",
+    "categoryId": 153
+  },
+  "100": {
+    "name": "Partner Integration 10",
+    "categoryId": 155
+  },
+  "101": {
+    "name": "Partner Integration 11",
+    "categoryId": 157
+  },
+  "102": {
+    "name": "Partner Integration 12",
+    "categoryId": 159
+  },
+  "103": {
+    "name": "Partner Integration 13",
+    "categoryId": 161
+  },
+  "104": {
+    "name": "Partner Integration 14",
+    "categoryId": 163
+  },
+  "105": {
+    "name": "Partner Integration 15",
+    "categoryId": 165
+  },
+  "106": {
+    "name": "Unauthorized IP Tunnel Access",
+    "categoryId": 169
+  },
+  "108": {
+    "name": "Newly Seen Domains",
+    "categoryId": 172
+  },
+  "109": {
+    "name": "Potentially Harmful",
+    "categoryId": 174
+  },
+  "110": {
+    "name": "DNS Tunneling VPN",
+    "categoryId": 176
+  },
+  "150": {
+    "name": "Cryptomining",
+    "categoryId": 403
+  }
+}

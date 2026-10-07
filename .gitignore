@@ -1,0 +1,27 @@
+# Node
+node_modules/
+package-lock.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE settings
+.vscode/
+.idea/
+
+# Chrome user data (dev)
+*.user-data-dir/
+
+# Snippet workspace
+.snippet/
+
+# Test/debug scripts
+extension/scripts/
+*.mp4
+
+# QA inputs (tenant data)
+qa/data/
+
+# Python bytecode
+__pycache__/

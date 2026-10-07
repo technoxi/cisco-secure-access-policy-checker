@@ -1,0 +1,72 @@
+[
+  {
+    "id": "ex-1",
+    "domain": "ninjarmm.com",
+    "description": "Tom Testing NINJA bypass",
+    "intent": "Bypass Secure Access",
+    "appliesTo": "All Devices, All Sites"
+  },
+  {
+    "id": "ex-2",
+    "domain": "ninjarmm.net",
+    "description": "Tom testing NINJARMM bypass",
+    "intent": "Bypass Secure Access",
+    "appliesTo": "All Devices, All Sites"
+  },
+  {
+    "id": "ex-3",
+    "domain": "nvsc-ad.local",
+    "description": "Local Domain",
+    "intent": "Bypass Secure Access",
+    "appliesTo": "All Devices, All Sites"
+  },
+  {
+    "id": "ex-4",
+    "domain": "scointranet.nv.gov",
+    "description": "Internal Executive Branch Resources",
+    "intent": "Bypass Secure Access",
+    "appliesTo": "All Devices, All Sites"
+  },
+  {
+    "id": "ex-5",
+    "domain": "state.nv.us",
+    "description": "",
+    "intent": "Bypass Secure Access",
+    "appliesTo": "All Devices, All Sites"
+  },
+  {
+    "id": "ex-6",
+    "domain": "thesource.jfs.ohio.gov",
+    "description": "",
+    "intent": "Bypass Secure Access",
+    "appliesTo": "All Devices, All Sites"
+  },
+  {
+    "id": "ex-7",
+    "domain": "ts01-gyr-maverick.cloudsink.net",
+    "description": "",
+    "intent": "Bypass Secure Access",
+    "appliesTo": "All Devices, All Sites"
+  },
+  {
+    "id": "ex-8",
+    "domain": "*halcyon.ai",
+    "description": "New Instance CrowdStrike Agent - ZW 2026-06-25",
+    "intent": "Bypass Web Proxy",
+    "appliesTo": "Hosted PAC, AnyConnect"
+  },
+  {
+    "id": "ex-9",
+    "domain": "api.laggar.gcw.crowdstrike.com",
+    "description": "CrowdsStrike Agent. -ZW 2026-06-15",
+    "intent": "Bypass Web Proxy",
+    "appliesTo": "Hosted PAC, AnyConnect"
+  },
+  {
+    "id": "ex-10",
+    "domain": "api.us-2.crowdstrike.com",
+    "description": "New Instance CrowdStrike Agent - GS 2026-06-15",
+    "intent": "Bypass Web Proxy",
+    "appliesTo": "Hosted PAC, AnyConnect"
+  }
+]
