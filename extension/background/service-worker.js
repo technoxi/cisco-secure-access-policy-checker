@@ -2785,14 +2785,23 @@ async function resolveExclusions(orgId, tabId) {
     if (!response.ok) return fallback;
     const json = await response.json();
     const items = Array.isArray(json) ? json : (json?.data || json?.results || json?.items || []);
-    if (!items.length) return fallback;
-    return items.map((item, idx) => ({
+    const orgItems = (items || []).map((item, idx) => ({
       id: item.id || `ex-${idx}`,
       domain: item.domain || item.name || item.domainName,
       description: item.description || "",
       intent: item.intent || (item.bypassWebProxy ? "Bypass Web Proxy" : "Bypass Secure Access"),
       appliesTo: item.appliesTo || (item.includeAllVAs && item.includeAllMobileDevices ? "All Devices, All Sites" : "All Devices, All Sites"),
     })).filter(item => item.domain);
+    const merged = [...orgItems];
+    const seen = new Set(orgItems.map(e => (e.domain || "").toLowerCase().trim()));
+    for (const fb of fallback) {
+      const d = (fb.domain || "").toLowerCase().trim();
+      if (d && !seen.has(d)) {
+        merged.push(fb);
+        seen.add(d);
+      }
+    }
+    return merged;
   } catch (err) {
     logEvent("catalog-fetch", "Exclusions fetch failed", { error: err.message });
     return fallback;

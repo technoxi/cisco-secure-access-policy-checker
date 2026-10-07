@@ -677,14 +677,14 @@
     const last = active[active.length - 1];
     if (!last) return { status: "unknown", title: "Not evaluated", stage: null };
     const bypassedStage = active.find(result => result.state === "bypassed");
-    if (last.state === "bypassed") {
+    if (bypassedStage) {
       const evaluated = active.find(result => result.state === "matched");
       if (evaluated) {
         const status = ACTION_LABELS[evaluated.action] ? evaluated.action : "unknown";
         const title = status === "allow" ? "Allowed (Bypasses Web Proxy)" : status === "warn" ? "Warned" : status === "isolate" ? "Isolated" : actionLabel(evaluated.action);
-        return { status, title, stage: evaluated.stage.key, rule: evaluated.match.rule, reason: last.reason };
+        return { status, title, stage: evaluated.stage.key, rule: evaluated.match.rule, reason: bypassedStage.reason };
       }
-      return { status: "bypassed", title: "Bypassed via Traffic Steering", stage: null, reason: last.reason };
+      return { status: "bypassed", title: "Bypassed via Traffic Steering", stage: null, reason: bypassedStage.reason };
     }
     const status = ACTION_LABELS[last.action] ? last.action : "unknown";
     const title = status === "allow" ? "Allowed" : status === "warn" ? "Warned" : status === "isolate" ? "Isolated" : actionLabel(last.action);

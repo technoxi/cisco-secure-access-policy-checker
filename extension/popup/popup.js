@@ -136,7 +136,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   async function buildLookups(snapshot) {
-    const lookups = { ...(await window.PopupSections.loadLookups()), ...snapshot.catalogs };
+    const staticBase = await window.PopupSections.loadLookups();
+    const lookups = { ...staticBase, ...snapshot.catalogs };
     lookups.sourceIdentityTypeIds = snapshot.catalogs.sourceIdentityTypeIds || {};
     lookups.identities = snapshot.identities;
     lookups.objects = snapshot.objects;
@@ -144,23 +145,34 @@ document.addEventListener("DOMContentLoaded", () => {
     for (const key of ["destinationLists", "networkObjects", "serviceObjectGroups", "applicationLists", "categoryLists", "appRiskProfiles", "postureProfiles", "geolocations", "applicationCategories", "enterpriseApplications"]) {
       lookups[key] = snapshot.catalogs[key] || {};
     }
-    if (snapshot.catalogs.exclusions && snapshot.catalogs.exclusions.length) {
-      lookups.exclusions = snapshot.catalogs.exclusions;
+    const orgExclusions = Array.isArray(snapshot.catalogs.exclusions) ? snapshot.catalogs.exclusions : [];
+    const staticExclusions = Array.isArray(staticBase.exclusions) ? staticBase.exclusions : [];
+    const merged = [...orgExclusions];
+    const seen = new Set(orgExclusions.map(e => (e.domain || "").toLowerCase().trim()));
+    for (const st of staticExclusions) {
+      const d = (st.domain || "").toLowerCase().trim();
+      if (d && !seen.has(d)) {
+        merged.push(st);
+        seen.add(d);
+      }
     }
+    lookups.exclusions = merged;
     lookups.memberMaps = snapshot.memberMaps;
     lookups.identityTypeNames = snapshot.identityTypeNames;
     return lookups;
   }
 
-  function renderResults(rules, findings, identityMap, objectMap, objectMaps, identityTypeMap) {
+  async function renderResults(rules, findings, identityMap, objectMap, objectMaps, identityTypeMap) {
     rulesRoot.innerHTML = "";
     auditHandle  = null;
 
     const identityOptions = window.Matcher.getIdentityOptions(rules);
+    const snapshot = policySnapshot();
+    const lookups = await buildLookups(snapshot);
 
     if (!testerHandle) testerHandle = window.TrafficPathPanel.create(
       testerRoot,
-      objectMaps || {},
+      lookups,
       /* onRun */ async (request, options = {}) => {
         const snapshot = policySnapshot();
         if (!snapshot.rules.length) return { error: "No rules are loaded yet. Open the dashboard's policy page and wait for the data to load." };
@@ -192,7 +204,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     );
 
-    testerHandle.setData({ rulesCount: rules.length, catalogs: objectMaps || {}, revision: dataRevision, context: isEmbeddedInPage() ? "dashboard" : "toolbar" });
+    testerHandle.setData({ rulesCount: rules.length, catalogs: lookups, revision: dataRevision, context: isEmbeddedInPage() ? "dashboard" : "toolbar" });
 
     // 2. Tab 2: Single Rules List — never an empty list while rules load.
     if (!rules.length) {
@@ -338,7 +350,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (seq !== loadSeq || revision !== dataRevision) return "superseded";
     applyPolicyData(cached);
     if (!currentRules.length) {
-      renderResults([], [], {}, {}, {}, {});
+      renderResults([], [], {}, {}, {}, {}).catch(() => {});
       triggerRefresh();
       return "empty";
     }
@@ -358,7 +370,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // entire Rules tab in a permanent "Resolving labels" loop.
     const missingCatalogs = requiredCatalogs.filter(key => !Object.prototype.hasOwnProperty.call(om, key));
     errorBanner.style.display = "none";
-    renderResults(currentRules, currentFindings, currentIdentityMap, currentObjectMap, currentObjectMaps, currentIdentityTypeMap);
+    renderResults(currentRules, currentFindings, currentIdentityMap, currentObjectMap, currentObjectMaps, currentIdentityTypeMap).catch(() => {});
 
     if (missingCatalogs.length === 0) {
       return "resolved";
