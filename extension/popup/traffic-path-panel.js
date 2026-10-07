@@ -626,7 +626,7 @@
       const blockedBy = stages.find(result => result.security && result.stage.key === outcome.stage);
       const summary = blockedBy
         ? `${blockedBy.security.category} · ${blockedBy.security.profile ? `security profile “${blockedBy.security.profile}” on ${ruleTitle(outcome.rule)}` : `DNS security setting “${blockedBy.security.setting}”`}`
-        : outcome.reason ? `${outcome.rule ? ruleTitle(outcome.rule) : "Connection path"} · ${outcome.reason}`
+        : outcome.reason ? (outcome.rule ? `${[ruleTitle(outcome.rule), rulePriority(outcome.rule)].filter(Boolean).join(" · ")} · ${outcome.reason}` : `Connection path · ${outcome.reason}`)
         : outcome.rule
         ? `${[ruleTitle(outcome.rule), rulePriority(outcome.rule)].filter(Boolean).join(" · ")}${outcome.unlessFlagged ? " · unless flagged as a threat" : ""}`
         : outcome.status === "pending" ? (question ? "Answer the question below to finish the check." : pendingReason) : "Default rules should always match. Refresh the dashboard data and try again.";
@@ -928,8 +928,8 @@
         stages: evaluation.stages.map(result => ({
           label: result.stage.label,
           state: result.state,
-          action: result.state === "matched" ? model.actionLabel(result.action) + (result.afterBlock ? ` if ${result.afterBlock.label} misses` : "") : "",
-          rule: result.match && result.match.rule ? ruleTitle(result.match.rule) : "",
+          action: result.state === "matched" ? model.actionLabel(result.action) + (result.afterBlock ? ` if ${result.afterBlock.label} misses` : "") : result.state === "bypassed" ? "Bypassed" : "",
+          rule: result.match && result.match.rule ? ruleTitle(result.match.rule) : (result.state === "bypassed" ? (result.reason || "Bypasses via Traffic Steering") : ""),
         })),
       };
     }
