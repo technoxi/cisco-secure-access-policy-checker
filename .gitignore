@@ -20,6 +20,9 @@ Thumbs.db
 extension/scripts/
 *.mp4
 
+# Archives
+*.zip
+
 # QA inputs (tenant data)
 qa/data/
 
