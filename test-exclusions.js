@@ -100,4 +100,35 @@ const defaultInternet = {
   assert.equal(evaluation.stages[1].state, "matched");
 }
 
+// 6. matchExclusion export and RFC-1918 private IP matching
+{
+  assert.equal(typeof model.matchExclusion, "function");
+  const defaultLocal = [
+    { id: "default-rfc1918", domain: "RFC-1918", intent: "Bypass Secure Access" },
+    { id: "default-local", domain: "local", intent: "Bypass Secure Access" },
+  ];
+  const matchedRfc = model.matchExclusion("10.50.1.20", defaultLocal);
+  assert.ok(matchedRfc, "RFC-1918 private IP should match RFC-1918 exclusion");
+  assert.equal(matchedRfc.intent, "Bypass Secure Access");
+  const matchedLocal = model.matchExclusion("printer.local", defaultLocal);
+  assert.ok(matchedLocal, ".local domain should match local exclusion");
+}
+
+// 7. Category API lookup failure does not block exception evaluation
+{
+  const built = model.buildRequest({
+    connection: "client",
+    sources: { roaming: "sourceRoaming:9" },
+    destination: "api.us-2.crowdstrike.com",
+    facts: {}
+  }, catalogs);
+  const earlyExclusion = model.matchExclusion(built.request.destination.host, catalogs.exclusions);
+  assert.ok(earlyExclusion);
+  assert.equal(earlyExclusion.intent, "Bypass Web Proxy");
+  const lookupFailed = { ok: false, error: "category API failed" };
+  const evaluation = model.evaluate(built.request, [defaultInternet], catalogs, matcher);
+  assert.equal(evaluation.outcome.status, "allow");
+  assert.equal(evaluation.stages[1].state, "bypassed");
+}
+
 console.log("PASS exclusion list and unconstrained VPN evaluations");
