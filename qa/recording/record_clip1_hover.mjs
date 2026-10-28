@@ -266,16 +266,11 @@ async function main() {
               pop.classList.add("sec-hover-visible");
             }
             const chip = pop?.querySelector(".sec-hp-chip.sec-hp-expandable");
-            if (chip) {
-              chip.dispatchEvent(new MouseEvent("mouseenter", {
-                bubbles: true, cancelable: true, clientX: ${ept.x}, clientY: ${ept.y}
-              }));
-              chip.click();
-            }
+            if (chip) chip.click();
             return true;
           })()`
         });
-        await sleep(800);
+        await sleep(600);
 
         // Glide into Level 1 panel expandable row (Intranet Resource) -> opens Level 2 panel
         const l1Pt = await c.send("Runtime.evaluate", {
@@ -283,7 +278,7 @@ async function main() {
             const pop = document.getElementById("sec-hover-popover");
             if (pop) { pop.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true })); pop.classList.add("sec-hover-visible"); }
             const panels = [...document.querySelectorAll(".sec-member-panel")];
-            panels.forEach(p => { p.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true })); p.classList.add("sec-member-visible"); });
+            panels.forEach(p => { p.style.opacity = "1"; p.style.visibility = "visible"; p.classList.add("sec-member-visible"); });
             if (!panels.length) return null;
             const expRow = panels[0].querySelector(".sec-mp-row.sec-mp-expandable");
             if (!expRow) return null;
@@ -297,24 +292,19 @@ async function main() {
           console.log("Gliding to Intranet Resource in Level 1 panel:", lpt);
           await moveCursorTo(c, lpt.x, lpt.y, 400);
           await pulseCursor(c);
-          // Open Level 2 panel via mouseenter + click
+          // Open Level 2 panel via direct click
           await c.send("Runtime.evaluate", {
             expression: `(() => {
               const pop = document.getElementById("sec-hover-popover");
               if (pop) { pop.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true })); pop.classList.add("sec-hover-visible"); }
               const panels = [...document.querySelectorAll(".sec-member-panel")];
-              panels.forEach(p => { p.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true })); p.classList.add("sec-member-visible"); });
+              panels.forEach(p => { p.style.opacity = "1"; p.style.visibility = "visible"; p.classList.add("sec-member-visible"); });
               const expRow = panels[0]?.querySelector(".sec-mp-row.sec-mp-expandable");
-              if (expRow) {
-                expRow.dispatchEvent(new MouseEvent("mouseenter", {
-                  bubbles: true, cancelable: true, clientX: ${lpt.x}, clientY: ${lpt.y}
-                }));
-                expRow.click();
-              }
+              if (expRow) expRow.click();
               return true;
             })()`
           });
-          await sleep(800);
+          await sleep(600);
 
           // Glide cursor into Level 2 panel row (intranet.d1.pseudoco.org Domain)
           const l2RowPt = await c.send("Runtime.evaluate", {
@@ -322,7 +312,7 @@ async function main() {
               const pop = document.getElementById("sec-hover-popover");
               if (pop) { pop.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true })); pop.classList.add("sec-hover-visible"); }
               const panels = [...document.querySelectorAll(".sec-member-panel")];
-              panels.forEach(p => { p.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true })); p.classList.add("sec-member-visible"); });
+              panels.forEach(p => { p.style.opacity = "1"; p.style.visibility = "visible"; p.classList.add("sec-member-visible"); });
               if (panels.length < 2) return null;
               const row = panels[1].querySelector(".sec-mp-row");
               if (!row) return null;
