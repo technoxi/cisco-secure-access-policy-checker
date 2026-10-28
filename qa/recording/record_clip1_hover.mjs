@@ -261,6 +261,10 @@ async function main() {
         await c.send("Runtime.evaluate", {
           expression: `(() => {
             const pop = document.getElementById("sec-hover-popover");
+            if (pop) {
+              pop.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
+              pop.classList.add("sec-hover-visible");
+            }
             const chip = pop?.querySelector(".sec-hp-chip.sec-hp-expandable");
             if (chip) {
               chip.dispatchEvent(new MouseEvent("mouseenter", {
@@ -276,7 +280,10 @@ async function main() {
         // Glide into Level 1 panel expandable row (Intranet Resource) -> opens Level 2 panel
         const l1Pt = await c.send("Runtime.evaluate", {
           expression: `(() => {
+            const pop = document.getElementById("sec-hover-popover");
+            if (pop) { pop.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true })); pop.classList.add("sec-hover-visible"); }
             const panels = [...document.querySelectorAll(".sec-member-panel")];
+            panels.forEach(p => { p.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true })); p.classList.add("sec-member-visible"); });
             if (!panels.length) return null;
             const expRow = panels[0].querySelector(".sec-mp-row.sec-mp-expandable");
             if (!expRow) return null;
@@ -293,7 +300,10 @@ async function main() {
           // Open Level 2 panel via mouseenter + click
           await c.send("Runtime.evaluate", {
             expression: `(() => {
+              const pop = document.getElementById("sec-hover-popover");
+              if (pop) { pop.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true })); pop.classList.add("sec-hover-visible"); }
               const panels = [...document.querySelectorAll(".sec-member-panel")];
+              panels.forEach(p => { p.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true })); p.classList.add("sec-member-visible"); });
               const expRow = panels[0]?.querySelector(".sec-mp-row.sec-mp-expandable");
               if (expRow) {
                 expRow.dispatchEvent(new MouseEvent("mouseenter", {
@@ -309,7 +319,10 @@ async function main() {
           // Glide cursor into Level 2 panel row (intranet.d1.pseudoco.org Domain)
           const l2RowPt = await c.send("Runtime.evaluate", {
             expression: `(() => {
+              const pop = document.getElementById("sec-hover-popover");
+              if (pop) { pop.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true })); pop.classList.add("sec-hover-visible"); }
               const panels = [...document.querySelectorAll(".sec-member-panel")];
+              panels.forEach(p => { p.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true })); p.classList.add("sec-member-visible"); });
               if (panels.length < 2) return null;
               const row = panels[1].querySelector(".sec-mp-row");
               if (!row) return null;
@@ -324,7 +337,7 @@ async function main() {
             await moveCursorTo(c, l2pt.x, l2pt.y, 400);
             await pulseCursor(c);
           }
-          await sleep(2200); // Hold so viewer clearly sees full 3-level cascade!
+          await sleep(2500); // Hold so viewer clearly sees full 3-level cascade!
         }
       }
 
