@@ -373,6 +373,19 @@
     if (!result.app || appIds.length) {
       facts.applicationId = { yes: appIds, no: [], all: true };
       facts.applicationListId = { yes: listsWith("applicationLists", appIds), no: [], all: true };
+      // App risk profiles only apply to recognized cloud applications.
+      facts.appRiskProfileId = { yes: [], no: [], all: true };
+    }
+    if (result.host && memberMaps.destinationLists) {
+      const host = result.host.toLowerCase();
+      const matchingDestLists = Object.entries(memberMaps.destinationLists)
+        .filter(([, entry]) => ((entry && entry.members) || []).some(member => {
+          const val = String(member.value || "").toLowerCase().trim();
+          if (!val) return false;
+          return val === host || host.endsWith("." + val) || val.startsWith(host + "/");
+        }))
+        .map(([id]) => String(id));
+      facts.destinationListId = { yes: matchingDestLists, no: [], all: true };
     }
     Object.values(facts).forEach(fact => { fact.auto = true; });
     return facts;
