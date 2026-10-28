@@ -266,11 +266,12 @@ async function main() {
               chip.dispatchEvent(new MouseEvent("mouseenter", {
                 bubbles: true, cancelable: true, clientX: ${ept.x}, clientY: ${ept.y}
               }));
+              chip.click();
             }
             return true;
           })()`
         });
-        await sleep(900);
+        await sleep(800);
 
         // Glide into Level 1 panel expandable row (Intranet Resource) -> opens Level 2 panel
         const l1Pt = await c.send("Runtime.evaluate", {
@@ -287,9 +288,9 @@ async function main() {
         if (l1Pt.result.value) {
           const lpt = l1Pt.result.value;
           console.log("Gliding to Intranet Resource in Level 1 panel:", lpt);
-          await moveCursorTo(c, lpt.x, lpt.y, 450);
+          await moveCursorTo(c, lpt.x, lpt.y, 400);
           await pulseCursor(c);
-          // Open Level 2 panel
+          // Open Level 2 panel via mouseenter + click
           await c.send("Runtime.evaluate", {
             expression: `(() => {
               const panels = [...document.querySelectorAll(".sec-member-panel")];
@@ -298,11 +299,32 @@ async function main() {
                 expRow.dispatchEvent(new MouseEvent("mouseenter", {
                   bubbles: true, cancelable: true, clientX: ${lpt.x}, clientY: ${lpt.y}
                 }));
+                expRow.click();
               }
               return true;
             })()`
           });
-          await sleep(2200); // Hold so viewer clearly sees 3-level cascade!
+          await sleep(800);
+
+          // Glide cursor into Level 2 panel row (intranet.d1.pseudoco.org Domain)
+          const l2RowPt = await c.send("Runtime.evaluate", {
+            expression: `(() => {
+              const panels = [...document.querySelectorAll(".sec-member-panel")];
+              if (panels.length < 2) return null;
+              const row = panels[1].querySelector(".sec-mp-row");
+              if (!row) return null;
+              const r = row.getBoundingClientRect();
+              return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+            })()`,
+            returnByValue: true
+          });
+          if (l2RowPt.result?.value) {
+            const l2pt = l2RowPt.result.value;
+            console.log("Gliding to Domain member in Level 2 panel:", l2pt);
+            await moveCursorTo(c, l2pt.x, l2pt.y, 400);
+            await pulseCursor(c);
+          }
+          await sleep(2200); // Hold so viewer clearly sees full 3-level cascade!
         }
       }
 
