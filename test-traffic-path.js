@@ -426,6 +426,8 @@ test("Cisco Investigate lookup answers every question", () => {
   assert.deepEqual(facts.applicationId.yes, ["993005"]);
   assert.deepEqual(facts.applicationListId.yes, ["20230"]);
   assert.deepEqual(facts.categoryListId.yes, ["7"]);
+  assert.deepEqual(facts.appRiskProfileId.yes, []);
+  assert.equal(facts.appRiskProfileId.all, true);
 
   // A rule on an app list and a rule on a category both resolve without asking.
   const aup = rule("AUP apps", "block", [SRC_ALL, cond("umbrella.destination.application_list_ids", "INTERSECT", [20230])]);

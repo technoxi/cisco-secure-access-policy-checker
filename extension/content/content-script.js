@@ -2039,7 +2039,7 @@ function showPopoverForRule(anchorEl, ruleName, testMatchReasons, autoHideMs) {
     // some future caller wants both sections; renderHoverPopoverContent() itself
     // decides which one to actually show.
     Promise.all([loadLookups(), loadIdentityMap(), loadIdentityTypeMap(), loadObjectMap(), loadMemberMaps()]).then(([lookups, identityMap, identityTypeMap, objectMapResult, memberMaps]) => {
-      lookups.identities = identityMap;
+      lookups.identities = Object.assign({}, identityMap, objectMapResult.objectMap || {});
       lookups.identityTypes = Object.assign({}, HOVER_DEFAULT_IDENTITY_TYPES, identityTypeMap);
       const om = objectMapResult.objectMaps || {};
       lookups.sourceIdentityTypeIds = om.sourceIdentityTypeIds || {};

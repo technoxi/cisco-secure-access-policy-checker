@@ -3035,8 +3035,18 @@ api.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   }
 
   if (msg.type === "GET_IDENTITY_MAP") {
-    api.storage.local.get("sse_identity_map").then(result => {
-      sendResponse({ identityMap: result.sse_identity_map || {} });
+    api.storage.local.get(["sse_identity_map", "sse_object_maps"]).then(result => {
+      const identityMap = Object.assign({}, result.sse_identity_map || {});
+      const objectMaps = result.sse_object_maps || {};
+      for (const map of Object.values(objectMaps)) {
+        if (map && typeof map === "object") {
+          for (const [k, v] of Object.entries(map)) {
+            if (typeof v === "string") identityMap[k] = v;
+            else if (v && typeof v === "object") identityMap[k] = v.name || v.label || v.displayName || v;
+          }
+        }
+      }
+      sendResponse({ identityMap });
     });
     return true;
   }
