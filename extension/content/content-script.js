@@ -259,16 +259,16 @@ function highlightRule(ruleName, matchedConditions) {
   currentHighlightEl = target;
 
   // Also show the rich hover popover (same one used for hovering chips) on
-  // this row, anchored to a source/destination chip if the row has one
-  // (falls back to the row itself, which still works fine as an anchor for
-  // positioning purposes). Only fires when triggered from a Test Policy
-  // result — matchedConditions is undefined when triggered from the Rules
-  // tab, and there's nothing test-specific to show in that case (hovering
-  // the row's own chips already covers it).
+  // this row, anchored to a source/destination chip if the row has one.
+  // Wait for the smooth scroll to finish so the popover only appears after
+  // the row exists in the visible view.
   if (Array.isArray(matchedConditions) && matchedConditions.length > 0) {
     const anchorEl = target.querySelector(CHIP_SELECTOR) || target;
     clearTimeout(hoverHideTimer);
-    showPopoverForRule(anchorEl, ruleName, matchedConditions);
+    setTimeout(() => {
+      if (!target.isConnected) return;
+      showPopoverForRule(anchorEl, ruleName, matchedConditions);
+    }, 400);
   }
 }
 
@@ -390,8 +390,11 @@ function highlightRules(targets) {
     currentHits.push({ ruleName: target.ruleName, row, ring });
   }
   syncRuleHits();
-  requestAnimationFrame(() => currentHits.forEach((hit) => hit.ring.classList.add("sec-hit-in")));
   if (currentHits[0]) scrollToRuleHit(currentHits[0].ruleName);
+  setTimeout(() => {
+    syncRuleHits();
+    currentHits.forEach((hit) => hit.ring.classList.add("sec-hit-in"));
+  }, 350);
   if (missing.length) console.warn("[SecPolicyChecker] HIGHLIGHT_RULES: no row found for", missing);
   return { found: currentHits.length, missing };
 }
@@ -1917,7 +1920,10 @@ function loadRulesAndFindings(callback) {
 // optional — omitted for normal hover (generic content, hover-only dismiss),
 // provided for the triggered case (test-specific reasoning, timed dismiss).
 function showPopoverForRule(anchorEl, ruleName, testMatchReasons, autoHideMs) {
-  const anchorRect = anchorEl.getBoundingClientRect();
+  if (!anchorEl || !anchorEl.isConnected) return;
+  const initialRect = anchorEl.getBoundingClientRect();
+  if (initialRect.width === 0 && initialRect.height === 0) return;
+
   const popover = getHoverPopoverEl();
   const isTriggered = Array.isArray(testMatchReasons) && testMatchReasons.length > 0;
   const hoverSide = isTriggered ? "all" : hoverSideForAnchor(anchorEl);
@@ -1948,13 +1954,18 @@ function showPopoverForRule(anchorEl, ruleName, testMatchReasons, autoHideMs) {
   }
 
   function reveal() {
+    if (!anchorEl || !anchorEl.isConnected) return;
+    const currentRect = anchorEl.getBoundingClientRect();
+    const inView = currentRect.bottom > 0 && currentRect.top < window.innerHeight && currentRect.right > 0 && currentRect.left < window.innerWidth;
+    if (!inView && !isTriggered) return;
+
     popover.classList.add("sec-hover-visible");
     // Keep the native cursor beside the card rather than anchoring to the
     // complete table-row rectangle, which can be far from where the user is
     // reading. Triggered popovers still use their highlight row rectangle.
     const anchor = isTriggered
-      ? { x: anchorRect.left, y: anchorRect.bottom }
-      : (hoverPointer || { x: anchorRect.left, y: anchorRect.bottom });
+      ? { x: currentRect.left, y: currentRect.bottom }
+      : (hoverPointer || { x: currentRect.left, y: currentRect.bottom });
     positionHoverPopover(popover, anchor);
     if (isTriggered) {
       // Triggered popover: stays open until user clicks outside
@@ -1977,14 +1988,16 @@ function showPopoverForRule(anchorEl, ruleName, testMatchReasons, autoHideMs) {
     }
   }
 
-  // For triggered (simulation) popovers: show immediately with match reasons,
-  // then enrich with rules/findings data if it arrives in time.
+  // Only reveal if the row is actually present and visible in view.
   if (isTriggered) {
     renderHoverPopoverContent(popover, ruleName, null, null, null, testMatchReasons, hoverSide);
     reveal();
   } else {
-    renderHoverSkeleton();
-    reveal();
+    const inView = initialRect.bottom > 0 && initialRect.top < window.innerHeight;
+    if (inView) {
+      renderHoverSkeleton();
+      reveal();
+    }
   }
 
   const requestKey = ++hoverRequestSeq;
