@@ -133,17 +133,26 @@ export async function resetPanel() {
   await panel.ev(`(() => { ["psc.policyChecker.draft.v2","psc.policyChecker.mode.v1","psc.policyChecker.describe.v1"].forEach(k => { try { sessionStorage.removeItem(k); localStorage.removeItem(k); } catch (_) {} }); [...document.querySelectorAll("button")].find(b => b.innerText.trim() === "Reset")?.click(); })()`);
   await pause(600);
 }
-export async function card(kicker, title, sub, ms = 3000) {
+export async function card(kicker, title, sub, ms = 3000, step) {
+  const dots = step ? [1, 2, 3, 4].map(n => `<span style="width:${n === step ? 34 : 10}px;height:10px;border-radius:5px;background:${n === step ? "#3B82F6" : "rgba(255,255,255,.28)"};display:inline-block;margin-right:8px;transition:all .4s"></span>`).join("") : "";
   await page.ev(`(() => {
-    let o = document.getElementById("v8-card"); if (o) o.remove();
-    o = document.createElement("div"); o.id = "v8-card";
-    o.style.cssText = "position:fixed;inset:0;z-index:2147483646;display:flex;align-items:center;justify-content:center;background:rgba(8,15,30,.86);backdrop-filter:blur(6px);opacity:0;transition:opacity .45s ease;font-family:Inter,system-ui,sans-serif";
-    o.innerHTML = '<div style="max-width:980px;padding:0 40px"><div style="color:#60A5FA;font-size:20px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:18px">' + ${JSON.stringify(kicker)} + '</div><div style="color:#fff;font-size:64px;font-weight:650;letter-spacing:-.02em;line-height:1.1">' + ${JSON.stringify(title)} + '</div><div style="color:#CBD5E1;font-size:28px;line-height:1.4;margin-top:22px">' + ${JSON.stringify(sub)} + '</div></div>';
+    document.getElementById("v8-card")?.remove();
+    if (!document.getElementById("v8-anim")) { const st = document.createElement("style"); st.id = "v8-anim"; st.textContent = "@keyframes v8up{from{opacity:0;transform:translateY(26px);filter:blur(6px)}to{opacity:1;transform:none;filter:none}}@keyframes v8left{from{opacity:0;transform:translateX(-24px)}to{opacity:1;transform:none}}@keyframes v8bar{from{transform:scaleY(0)}to{transform:scaleY(1)}}@keyframes v8cap{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}"; document.head.appendChild(st); }
+    const o = document.createElement("div"); o.id = "v8-card";
+    o.style.cssText = "position:fixed;inset:0;z-index:2147483646;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 30% 40%,rgba(30,58,138,.55),rgba(8,15,30,.96) 70%);backdrop-filter:blur(10px);opacity:0;transition:opacity .4s ease;font-family:Inter,system-ui,sans-serif";
+    o.innerHTML = '<div style="display:flex;gap:34px;max-width:1180px;padding:0 60px"><div style="width:8px;border-radius:4px;background:linear-gradient(#60A5FA,#2563EB);transform-origin:top;animation:v8bar .5s .05s both cubic-bezier(.2,.8,.2,1)"></div><div><div style="color:#60A5FA;font-size:22px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;margin-bottom:20px;animation:v8left .45s .15s both cubic-bezier(.2,.8,.2,1)"></div><div id="v8-t" style="color:#fff;font-size:76px;font-weight:650;letter-spacing:-.025em;line-height:1.08;animation:v8up .6s .25s both cubic-bezier(.2,.8,.2,1)"></div><div id="v8-s" style="color:#CBD5E1;font-size:30px;line-height:1.4;margin-top:26px;max-width:960px;animation:v8up .55s .5s both cubic-bezier(.2,.8,.2,1)"></div><div id="v8-d" style="margin-top:44px;animation:v8up .5s .75s both"></div></div></div>';
+    o.children[0].children[1].children[0].textContent = ${JSON.stringify(kicker)};
+    o.querySelector("#v8-t").textContent = ${JSON.stringify(title)};
+    o.querySelector("#v8-s").textContent = ${JSON.stringify(sub)};
+    o.querySelector("#v8-d").innerHTML = ${JSON.stringify(dots)};
     document.body.appendChild(o); requestAnimationFrame(() => o.style.opacity = "1");
   })()`);
-  await pause(ms);
-  await page.ev(`(() => { const o = document.getElementById("v8-card"); if (o) { o.style.opacity = "0"; setTimeout(() => o.remove(), 500); } })()`);
-  await pause(550);
+  await sleep(ms);
+  await page.ev(`(() => { const o = document.getElementById("v8-card"); if (o) { o.style.transition = "opacity .45s ease"; o.style.opacity = "0"; setTimeout(() => o.remove(), 500); } })()`);
+  await sleep(450);
+}
+export async function pulse() {
+  await panel.ev(`(() => { if (!document.getElementById("v8-pulse")) { const st = document.createElement("style"); st.id = "v8-pulse"; st.textContent = "@keyframes v8ring{0%{box-shadow:0 0 0 0 rgba(37,99,235,.6)}100%{box-shadow:0 0 0 22px rgba(37,99,235,0)}}.tp-outcome.v8p{animation:v8ring .9s ease-out 2}"; document.head.appendChild(st); } const o = document.querySelector(".tp-outcome"); if (o) { o.classList.remove("v8p"); void o.offsetWidth; o.classList.add("v8p"); } })()`);
 }
 export async function setPanel(open) {
   const isOpen = await page.ev(`document.getElementById("sec-embed-panel")?.classList.contains("sec-embed-open")`);
@@ -218,9 +227,9 @@ export async function prep() {
   await page.ev(`(() => { ["psc.policyChecker.draft.v2","psc.policyChecker.mode.v1","psc.policyChecker.describe.v1"].forEach(k => { try { sessionStorage.removeItem(k); localStorage.removeItem(k); } catch (_) {} }); })()`);
 }
 
-export async function caption(text) {
-  const T = JSON.stringify(text || "");
-  await page.ev(`(() => { const text = ${T}; let c = document.getElementById("v8-cap"); if (!text) { if (c) c.style.opacity = "0"; return; } if (!c) { c = document.createElement("div"); c.id = "v8-cap"; c.style.cssText = "position:fixed;left:32px;bottom:34px;z-index:2147483640;max-width:560px;padding:12px 18px;border-radius:10px;background:rgba(15,23,42,.92);color:#fff;font:600 20px/1.3 Inter,system-ui,sans-serif;border-left:5px solid #3B82F6;box-shadow:0 10px 30px rgba(0,0,0,.35);transition:opacity .25s;opacity:0"; document.body.appendChild(c); } c.textContent = text; requestAnimationFrame(() => c.style.opacity = "1"); })()`);
+export async function caption(head, sub) {
+  const H = JSON.stringify(head || ""), S = JSON.stringify(sub || "");
+  await page.ev(`(() => { const head = ${H}, sub = ${S}; if (!document.getElementById("v8-anim")) { const st = document.createElement("style"); st.id = "v8-anim"; st.textContent = "@keyframes v8up{from{opacity:0;transform:translateY(26px);filter:blur(6px)}to{opacity:1;transform:none;filter:none}}@keyframes v8left{from{opacity:0;transform:translateX(-24px)}to{opacity:1;transform:none}}@keyframes v8bar{from{transform:scaleY(0)}to{transform:scaleY(1)}}@keyframes v8cap{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}"; document.head.appendChild(st); } let c = document.getElementById("v8-cap"); if (!head) { if (c) c.style.opacity = "0"; return; } if (!c) { c = document.createElement("div"); c.id = "v8-cap"; c.style.cssText = "position:fixed;left:32px;bottom:34px;z-index:2147483640;width:640px;padding:14px 20px;border-radius:12px;background:rgba(15,23,42,.94);color:#fff;font-family:Inter,system-ui,sans-serif;border-left:6px solid #3B82F6;box-shadow:0 10px 30px rgba(0,0,0,.35);transition:opacity .25s;opacity:0"; document.body.appendChild(c); } c.innerHTML = '<div style="font:700 24px/1.25 Inter,system-ui,sans-serif"></div><div style="font:400 19px/1.4 Inter,system-ui,sans-serif;color:#CBD5E1;margin-top:4px"></div>'; c.children[0].textContent = head; c.children[1].textContent = sub; c.children[1].style.display = sub ? "block" : "none"; c.style.animation = "none"; void c.offsetWidth; c.style.animation = "v8cap .45s cubic-bezier(.2,.8,.2,1) both"; c.style.opacity = "1"; })()`);
 }
 export async function clearPicker(inputId) {
   const expr = `document.getElementById("${inputId}").closest(".tp-picker").querySelector("button")`;
