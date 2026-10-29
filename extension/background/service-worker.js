@@ -3055,8 +3055,13 @@ api.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     api.storage.local.get("sse_object_maps").then(result => {
       const objectMaps = result.sse_object_maps || {};
       const objectMap = {};
-      for (const map of Object.values(objectMaps)) {
-        Object.assign(objectMap, map);
+      for (const [mapName, map] of Object.entries(objectMaps)) {
+        if (mapName === "sourceIdentityTypeIds" || !map || typeof map !== "object") continue;
+        for (const [k, v] of Object.entries(map)) {
+          if (typeof v === "number" || typeof v === "boolean") continue;
+          if (typeof objectMap[k] === "string" && typeof v !== "string") continue;
+          objectMap[k] = v;
+        }
       }
       sendResponse({ objectMap, objectMaps });
     });
