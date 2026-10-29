@@ -172,8 +172,8 @@ export async function typeIntoPanelInput(cPage, cPanel, inputId, text, speedMs =
       const el = document.getElementById(${JSON.stringify(inputId)});
       if (!el) return false;
       el.focus();
-      Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, value).set.call(el, );
-      el.dispatchEvent(new Event(input, { bubbles: true }));
+      Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set.call(el, "");
+      el.dispatchEvent(new Event("input", { bubbles: true }));
       return true;
     })()`
   });
@@ -186,8 +186,8 @@ export async function typeIntoPanelInput(cPage, cPanel, inputId, text, speedMs =
       expression: `(() => {
         const el = document.getElementById(${JSON.stringify(inputId)});
         if (!el) return false;
-        Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, value).set.call(el, ${JSON.stringify(cur)});
-        el.dispatchEvent(new Event(input, { bubbles: true }));
+        Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set.call(el, ${JSON.stringify(cur)});
+        el.dispatchEvent(new Event("input", { bubbles: true }));
         return true;
       })()`
     });
@@ -204,12 +204,12 @@ export async function pickPanelDropdown(cPage, cPanel, inputId, queryText, targe
   const optCoord = await cPanel.send("Runtime.evaluate", {
     expression: `(() => {
       const input = document.getElementById(${JSON.stringify(inputId)});
-      const wrap = input?.closest(.tp-picker);
-      const opts = [...(wrap || document).querySelectorAll([role=option], .tp-picker-option)].filter(o => getComputedStyle(o).display !== none);
+      const wrap = input?.closest(".tp-picker");
+      const opts = [...(wrap || document).querySelectorAll("[role=option], .tp-picker-option")].filter(o => getComputedStyle(o).display !== "none");
       const opt = opts.find(o => o.innerText.toLowerCase().includes(${JSON.stringify(targetLabel.toLowerCase())}));
       if (!opt) return null;
-      opts.forEach(o => o.classList.remove(is-active));
-      opt.classList.add(is-active);
+      opts.forEach(o => o.classList.remove("is-active"));
+      opt.classList.add("is-active");
       const r = opt.getBoundingClientRect();
       return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
     })()`,
@@ -235,13 +235,13 @@ export async function pickPanelDropdown(cPage, cPanel, inputId, queryText, targe
   await cPanel.send("Runtime.evaluate", {
     expression: `(() => {
       const input = document.getElementById(${JSON.stringify(inputId)});
-      const wrap = input?.closest(.tp-picker);
-      const opts = [...(wrap || document).querySelectorAll([role=option], .tp-picker-option)].filter(o => getComputedStyle(o).display !== none);
+      const wrap = input?.closest(".tp-picker");
+      const opts = [...(wrap || document).querySelectorAll("[role=option], .tp-picker-option")].filter(o => getComputedStyle(o).display !== "none");
       const opt = opts.find(o => o.innerText.toLowerCase().includes(${JSON.stringify(targetLabel.toLowerCase())}));
       if (!opt) return false;
-      opt.dispatchEvent(new MouseEvent(mousedown, { bubbles: true, cancelable: true }));
-      opt.dispatchEvent(new MouseEvent(mouseup, { bubbles: true, cancelable: true }));
-      opt.dispatchEvent(new MouseEvent(click, { bubbles: true, cancelable: true }));
+      opt.dispatchEvent(new MouseEvent("mousedown", { bubbles: true, cancelable: true }));
+      opt.dispatchEvent(new MouseEvent("mouseup", { bubbles: true, cancelable: true }));
+      opt.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
       return true;
     })()`
   });
