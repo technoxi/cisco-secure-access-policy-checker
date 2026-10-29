@@ -34,6 +34,7 @@ export async function init() {
       setInterval(() => { [...document.querySelectorAll("button")].filter(b => /^(OK|Stay signed in|Continue)$/i.test(b.innerText.trim()) && b.closest("[role=dialog],[class*=modal],[class*=Modal]")).forEach(b => b.click()); }, 3000);
     }
   })()`);
+  await page.ev(`(() => { const strip = () => document.querySelectorAll('[title="Secure Access Policy Checker"]').forEach(e => e.removeAttribute("title")); strip(); if (!window.__vstrip) window.__vstrip = setInterval(strip, 300); })()`);
   const pos = await page.ev("window.__vcpos || null");
   if (pos) { cx = pos[0]; cy = pos[1]; }
   await refreshPanel();

@@ -20,6 +20,7 @@ async function intoChip(k, hold = 2600) {
 const scenes = {
   async hover() {
     await d.fresh();
+    await d.card("Secure Access Policy Checker", "Understand any rule. Check any request.", "Live on the Cisco Secure Access dashboard", 3200);
     await d.card("Chapter 1", "Hover any rule", "Groups, IP objects and nested resources resolve right on the Access Policy table", 3200);
     await d.scrollTable(0, 800);
     await hover("src", 2, 2600);
@@ -72,7 +73,7 @@ async function check(o) {
   await sleep(700);
   for (const [kind, id, a, b] of o.steps) {
     if (kind === "pick") await d.pick(id, a, b);
-    else if (kind === "type") await d.typeInto(id, a, 85);
+    else if (kind === "type") await d.typeInto(id, a, 75);
     else if (kind === "select") {
       const p = await d.panelPoint(`document.getElementById("${id}")`);
       await d.click(p.x, p.y);
@@ -84,17 +85,17 @@ async function check(o) {
   }
   await sleep(900);
   await d.clickPanel(`[...document.querySelectorAll("button")].find(b => b.innerText.trim() === "Check policy")`);
-  await d.waitPanel(`/Allowed|Blocked|Bypass|Pending|Waiting/.test(document.body.innerText)`);
+  await d.waitPanel(`[...document.querySelectorAll("button")].some(b => b.innerText.trim() === "Show on page") || /Waiting on your answer/.test(document.body.innerText)`, 45000);
   await sleep(1200);
   await d.Q().ev(`document.querySelector("button.tp-show-on-page, [data-action=show-on-page]")?.scrollIntoView({ block: "center", behavior: "smooth" })`);
   await sleep(500);
-  const verdict = await d.Q().ev(`document.body.innerText.match(/(Allowed|Blocked|Bypasses[^\\n]*|Pending[^\\n]*)\\n[^\\n]*/)?.[0] || ""`);
+  const verdict = await d.Q().ev(`document.body.innerText.split("Check policy\\n")[1]?.slice(0, 160) || ""`);
   console.log("VERDICT:", verdict.replace(/\n/g, " | "));
-  await sleep(4500);
+  await sleep(3800);
   const show = `[...document.querySelectorAll("button")].find(x => x.innerText.trim() === "Show on page")`;
   if (await d.Q().ev(`!!(${show})`)) {
     await d.clickPanel(show);
-    await sleep(4800);
+    await sleep(4000);
   }
   await d.parkCursor(700, 960);
   await sleep(800);
