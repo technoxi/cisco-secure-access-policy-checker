@@ -240,3 +240,18 @@ export async function runPageNav(url, wait = 9000) {
   await page.send("Page.navigate", { url });
   await sleep(wait);
 }
+
+export async function blackCard(text, ms = 2500) {
+  await page.ev(`(() => {
+    document.getElementById("v8-black")?.remove();
+    if (!document.getElementById("v8-anim")) { const st = document.createElement("style"); st.id = "v8-anim"; st.textContent = "@keyframes v8up{from{opacity:0;transform:translateY(26px);filter:blur(6px)}to{opacity:1;transform:none;filter:none}}"; document.head.appendChild(st); }
+    const o = document.createElement("div"); o.id = "v8-black";
+    o.style.cssText = "position:fixed;inset:0;z-index:2147483647;background:#000;display:flex;align-items:center;justify-content:center;font-family:Inter,system-ui,sans-serif";
+    const t = document.createElement("div");
+    t.style.cssText = "color:#fff;font-size:72px;font-weight:600;letter-spacing:-.02em;animation:v8up .8s .3s both cubic-bezier(.2,.8,.2,1)";
+    t.textContent = ${JSON.stringify(text)};
+    o.appendChild(t); document.body.appendChild(o);
+  })()`);
+  await sleep(ms);
+  await page.ev(`(() => { const o = document.getElementById("v8-black"); if (o) { o.style.transition = "opacity .5s ease"; o.style.opacity = "0"; setTimeout(() => o.remove(), 600); } })()`);
+}

@@ -49,7 +49,7 @@ async function ensureOpen() { if (!(await Q()?.ev("1").catch(() => 0))) await d.
 
 const scenes = {
   async s1() {
-    await d.card("Secure Access Policy Checker", "Who can reach what, and why", "Live on a real Secure Access tenant", 2000);
+    await d.blackCard("Secure Access Extension Demo", 2600);
     await d.card("Feature 1 of 4", "See inside any rule", "Hover groups, categories and nested objects right on the Access Policy table", 2700, 1);
     await d.scrollTable(17, 700);
     await d.caption("Rule 18 \u00b7 Finance Content Blocks", "Blocks the Finance group from restricted categories");
