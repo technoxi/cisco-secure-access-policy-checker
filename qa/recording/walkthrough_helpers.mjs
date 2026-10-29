@@ -197,8 +197,8 @@ export async function typeIntoPanelInput(cPage, cPanel, inputId, text, speedMs =
 }
 
 export async function pickPanelDropdown(cPage, cPanel, inputId, queryText, targetLabel) {
-  await typeIntoPanelInput(cPage, cPanel, inputId, queryText, 55);
-  await sleep(350);
+  await typeIntoPanelInput(cPage, cPanel, inputId, queryText, 70);
+  await sleep(450);
 
   // Find option coordinates and move cursor onto it
   const optCoord = await cPanel.send("Runtime.evaluate", {

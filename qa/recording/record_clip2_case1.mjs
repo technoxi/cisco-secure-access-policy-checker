@@ -6,6 +6,22 @@ async function main() {
   const cPanel = await connect(panelTarget());
   await initVirtualCursor(cPage);
 
+  // Reset any saved drafts or form content in storage to guarantee clean initial state
+  await cPanel.send("Runtime.evaluate", {
+    expression: `(() => {
+      try { sessionStorage.removeItem("psc.policyChecker.draft.v2"); } catch (_) {}
+      try { sessionStorage.removeItem("psc.policyChecker.mode.v1"); } catch (_) {}
+      try { sessionStorage.removeItem("psc.policyChecker.describe.v1"); } catch (_) {}
+      try { localStorage.removeItem("psc.policyChecker.draft.v2"); } catch (_) {}
+      try { localStorage.removeItem("psc.policyChecker.mode.v1"); } catch (_) {}
+      try { localStorage.removeItem("psc.policyChecker.describe.v1"); } catch (_) {}
+      const btn = [...document.querySelectorAll("button")].find(b => b.innerText.trim() === "Reset");
+      if (btn) btn.click();
+      return true;
+    })()`
+  });
+  await sleep(600);
+
   // Section 2 Intro Banner
   await showSectionIntro(
     cPage,
@@ -18,21 +34,21 @@ async function main() {
   // 1. Move cursor to Secure Client connection card and select
   console.log("Selecting Secure Client connection...");
   await clickPanelElement(cPage, cPanel, () => document.querySelector("input.tp-connection-radio[value=\"client\"]")?.closest("label") || document.querySelector("input.tp-connection-radio[value=\"client\"]"));
-  await sleep(800);
+  await sleep(900);
 
-  // 2. Pick wkst1 posture
+  // 2. Pick wkst1 posture with visible typing and selection
   console.log("Picking wkst1 posture...");
   await pickPanelDropdown(cPage, cPanel, "tp-src-roaming", "wkst1", "wkst1");
-  await sleep(600);
+  await sleep(700);
 
-  // 3. Pick Carol Freeman AD User
+  // 3. Pick Carol Freeman AD User with visible typing and selection
   console.log("Picking Carol Freeman...");
   await pickPanelDropdown(cPage, cPanel, "tp-src-identity", "carol", "Carol Freeman");
-  await sleep(600);
+  await sleep(700);
 
-  // 4. Type destination example.com
+  // 4. Type destination example.com character by character at natural human pace
   console.log("Typing destination...");
-  await typeIntoPanelInput(cPage, cPanel, "tp-destination", "example.com", 55);
+  await typeIntoPanelInput(cPage, cPanel, "tp-destination", "example.com", 70);
   await sleep(1500);
 
   // 5. Move cursor to Check policy button and click
