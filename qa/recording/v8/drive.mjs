@@ -1,6 +1,8 @@
 import { execSync } from "node:child_process";
 const BASE = "http://127.0.0.1:9222";
 export const sleep = ms => new Promise(r => setTimeout(r, ms));
+export const SPEED = +(process.env.SPEED || 1);
+export const pause = ms => sleep(ms * SPEED);
 const list = () => JSON.parse(execSync(`curl -sS ${BASE}/json/list`).toString());
 
 async function open(t) {
@@ -53,7 +55,7 @@ let cx = 1000, cy = 600;
 const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 export async function move(x, y, ms = 650) {
   const x0 = cx, y0 = cy, dist = Math.hypot(x - x0, y - y0);
-  ms = Math.max(220, Math.min(ms, 250 + dist * 0.9));
+  ms = SPEED * Math.max(220, Math.min(ms, 250 + dist * 0.9)); ms = Math.max(ms, 130);
   const n = Math.round(ms / 16);
   const nx = -(y - y0) / (dist || 1), ny = (x - x0) / (dist || 1), arc = Math.min(40, dist * 0.06);
   for (let i = 1; i <= n; i++) {
@@ -69,12 +71,12 @@ export async function move(x, y, ms = 650) {
 }
 export async function click(x, y) {
   await move(x, y);
-  await sleep(120);
+  await pause(120);
   await page.ev("__vclick()");
   await page.send("Input.dispatchMouseEvent", { type: "mousePressed", x, y, button: "left", clickCount: 1 });
-  await sleep(70);
+  await pause(70);
   await page.send("Input.dispatchMouseEvent", { type: "mouseReleased", x, y, button: "left", clickCount: 1 });
-  await sleep(250);
+  await pause(250);
 }
 export async function key(k, mods = 0) {
   const map = { Backspace: 8, Enter: 13, Tab: 9, Escape: 27, a: 65 };
@@ -85,7 +87,7 @@ export async function typeText(text, ms = 70) {
   for (const ch of text) {
     await page.send("Input.dispatchKeyEvent", { type: "keyDown", text: ch, key: ch, unmodifiedText: ch });
     await page.send("Input.dispatchKeyEvent", { type: "keyUp", key: ch });
-    await sleep(ms + Math.random() * 40);
+    await pause(ms + Math.random() * 40);
   }
 }
 
@@ -96,7 +98,7 @@ async function panelOrigin() {
 export async function panelPoint(expr, scroll = true) {
   if (scroll) {
     await panel.ev(`(() => { const el = (${expr}); if (el) el.scrollIntoView({ block: "center", behavior: "smooth" }); })()`);
-    await sleep(450);
+    await pause(450);
   }
   const r = await panel.ev(`(() => { const el = (${expr}); if (!el) return null; const r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; })()`);
   if (!r) throw new Error("panel element not found: " + expr);
@@ -104,7 +106,7 @@ export async function panelPoint(expr, scroll = true) {
   return { x: o.x + r.x, y: o.y + r.y };
 }
 export async function pageRect(expr, scroll = "center") {
-  if (scroll) { await page.ev(`(() => { const el = (${expr}); if (el) el.scrollIntoView({ block: "${scroll}", behavior: "smooth" }); })()`); await sleep(700); }
+  if (scroll) { await page.ev(`(() => { const el = (${expr}); if (el) el.scrollIntoView({ block: "${scroll}", behavior: "smooth" }); })()`); await pause(700); }
   const r = await page.ev(`(() => { const el = (${expr}); if (!el) return null; const r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, w: r.width, h: r.height, l: r.left, t: r.top }; })()`);
   if (!r) throw new Error("page element not found: " + expr);
   return r;
@@ -113,23 +115,23 @@ export async function clickPanel(expr) { const p = await panelPoint(expr); await
 export async function typeInto(inputId, text, ms = 70) {
   const p = await panelPoint(`document.getElementById("${inputId}")`);
   await click(p.x, p.y);
-  await sleep(150);
+  await pause(150);
   await typeText(text, ms);
-  await sleep(300);
+  await pause(300);
 }
 export async function pick(inputId, query, label, ms = 80) {
   await typeInto(inputId, query, ms);
-  await sleep(500);
+  await pause(500);
   const expr = `[...document.querySelectorAll("#${inputId}")[0].closest(".tp-picker").querySelectorAll("[role=option], .tp-picker-option")].sort((a, b) => 0).find(o => o.innerText.toLowerCase().trim().startsWith(${JSON.stringify(label.toLowerCase())})) || [...document.querySelectorAll("#${inputId}")[0].closest(".tp-picker").querySelectorAll("[role=option], .tp-picker-option")].find(o => o.innerText.toLowerCase().includes(${JSON.stringify(label.toLowerCase())}))`;
   const p = await panelPoint(expr, false);
   await move(p.x, p.y, 500);
-  await sleep(350);
+  await pause(350);
   await click(p.x, p.y);
-  await sleep(500);
+  await pause(500);
 }
 export async function resetPanel() {
   await panel.ev(`(() => { ["psc.policyChecker.draft.v2","psc.policyChecker.mode.v1","psc.policyChecker.describe.v1"].forEach(k => { try { sessionStorage.removeItem(k); localStorage.removeItem(k); } catch (_) {} }); [...document.querySelectorAll("button")].find(b => b.innerText.trim() === "Reset")?.click(); })()`);
-  await sleep(600);
+  await pause(600);
 }
 export async function card(kicker, title, sub, ms = 3000) {
   await page.ev(`(() => {
@@ -139,13 +141,13 @@ export async function card(kicker, title, sub, ms = 3000) {
     o.innerHTML = '<div style="max-width:980px;padding:0 40px"><div style="color:#60A5FA;font-size:20px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:18px">' + ${JSON.stringify(kicker)} + '</div><div style="color:#fff;font-size:64px;font-weight:650;letter-spacing:-.02em;line-height:1.1">' + ${JSON.stringify(title)} + '</div><div style="color:#CBD5E1;font-size:28px;line-height:1.4;margin-top:22px">' + ${JSON.stringify(sub)} + '</div></div>';
     document.body.appendChild(o); requestAnimationFrame(() => o.style.opacity = "1");
   })()`);
-  await sleep(ms);
+  await pause(ms);
   await page.ev(`(() => { const o = document.getElementById("v8-card"); if (o) { o.style.opacity = "0"; setTimeout(() => o.remove(), 500); } })()`);
-  await sleep(550);
+  await pause(550);
 }
 export async function setPanel(open) {
   const isOpen = await page.ev(`document.getElementById("sec-embed-panel")?.classList.contains("sec-embed-open")`);
-  if (!!isOpen !== open) { await page.ev(`document.getElementById("sec-embed-toggle").click()`); await sleep(900); }
+  if (!!isOpen !== open) { await page.ev(`document.getElementById("sec-embed-toggle").click()`); await pause(900); }
   if (open) await refreshPanel();
 }
 
@@ -158,7 +160,7 @@ export async function scrollTable(rowIdx, ms = 700) {
     const top = row.offsetTop - (box.clientHeight - head) / 2 + head / 2;
     box.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
   })()`);
-  await sleep(ms);
+  await pause(ms);
 }
 export async function dismissOverlays() {
   await page.send("Input.dispatchMouseEvent", { type: "mousePressed", x: 500, y: 960, button: "left", clickCount: 1 });
@@ -181,12 +183,12 @@ export async function fresh() {
   await refreshPanel();
   if (panel) await resetPanel();
   await page.ev(`document.querySelector("[class*=cds-table-container]")?.scrollTo({ top: 0 })`);
-  await sleep(500);
+  await pause(500);
 }
 export async function openPanelClick() {
   const r = await pageRect(`document.getElementById("sec-embed-toggle")`, null);
   await click(r.x, r.y);
-  await sleep(1100);
+  await pause(1100);
   await refreshPanel();
 }
 async function stableRect(expr) {
@@ -194,24 +196,38 @@ async function stableRect(expr) {
   for (let i = 0; i < 20; i++) {
     const r = await pageRect(expr, null);
     if (prev && Math.abs(r.x - prev.x) < 0.5 && Math.abs(r.y - prev.y) < 0.5) return r;
-    prev = r; await sleep(160);
+    prev = r; await pause(160);
   }
   return prev;
 }
 export async function hoverCell(expr, ms = 500, left = false) {
   const r = await stableRect(expr);
   await move(left ? r.l + 28 : r.x, r.y, ms);
-  await sleep(900);
+  await pause(900);
 }
-export async function parkCursor(x = 560, y = 980) { await move(x, y, 500); await sleep(500); }
+export async function parkCursor(x = 560, y = 980) { await move(x, y, 500); await pause(500); }
 
 export async function prep() {
-  await page.send("Page.reload");
-  await sleep(4000);
+  await page.send("Page.navigate", { url: "https://dashboard.sse.cisco.com/org/8176184/secure/policy" });
+  await pause(4000);
   for (let i = 0; i < 40; i++) {
     const ok = await page.ev(`!!document.getElementById("sec-embed-toggle") && document.querySelectorAll('[data-testid="policy-source-column"]').length > 30`).catch(() => false);
-    if (ok) break; await sleep(500);
+    if (ok) break; await pause(500);
   }
-  await sleep(6000);
+  await pause(6000);
   await page.ev(`(() => { ["psc.policyChecker.draft.v2","psc.policyChecker.mode.v1","psc.policyChecker.describe.v1"].forEach(k => { try { sessionStorage.removeItem(k); localStorage.removeItem(k); } catch (_) {} }); })()`);
+}
+
+export async function caption(text) {
+  const T = JSON.stringify(text || "");
+  await page.ev(`(() => { const text = ${T}; let c = document.getElementById("v8-cap"); if (!text) { if (c) c.style.opacity = "0"; return; } if (!c) { c = document.createElement("div"); c.id = "v8-cap"; c.style.cssText = "position:fixed;left:32px;bottom:34px;z-index:2147483640;max-width:560px;padding:12px 18px;border-radius:10px;background:rgba(15,23,42,.92);color:#fff;font:600 20px/1.3 Inter,system-ui,sans-serif;border-left:5px solid #3B82F6;box-shadow:0 10px 30px rgba(0,0,0,.35);transition:opacity .25s;opacity:0"; document.body.appendChild(c); } c.textContent = text; requestAnimationFrame(() => c.style.opacity = "1"); })()`);
+}
+export async function clearPicker(inputId) {
+  const expr = `document.getElementById("${inputId}").closest(".tp-picker").querySelector("button")`;
+  const has = await panel.ev(`!!(${expr})`);
+  if (has) await clickPanel(expr);
+}
+export async function runPageNav(url, wait = 9000) {
+  await page.send("Page.navigate", { url });
+  await sleep(wait);
 }
