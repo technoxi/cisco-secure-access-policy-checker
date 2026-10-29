@@ -52,7 +52,7 @@ const scenes = {
     await d.blackCard("Secure Access Extension Demo", 2600);
     await d.card("Feature 1 of 4", "See inside any rule", "Hover groups, categories and nested objects right on the Access Policy table", 2700, 1);
     await d.scrollTable(17, 700);
-    await d.caption("Rule 18 \u00b7 Finance Content Blocks", "Blocks the Finance group from restricted categories");
+    await d.caption("A real company policy", "Finance Content Blocks stops Finance staff reaching risky categories such as gambling and adult sites.");
     await d.hoverCell(srcCell(17), 450, true); await sleep(700);
     await d.hoverCell(expChip(0), 350); await sleep(1500);
     await d.hoverCell(dstItem(17, 0), 450); await sleep(700);
@@ -60,19 +60,19 @@ const scenes = {
     await d.parkCursor(); await d.caption("");
   },
   async s2() {
-    await Promise.all([d.card("Feature 2 of 4", "Check any request", "Allowed, blocked or isolated, and the exact rule that decided it", 2700, 2), d.fresh()]);
+    await Promise.all([d.card("Feature 2 of 4", "Check any request", "Allowed, blocked or isolated, and which policy decided it", 2700, 2), d.fresh()]);
     await d.openPanelClick();
     await d.clickPanel(`document.querySelector('input.tp-connection-radio[value="client"]').closest("label")`);
-    await runCase({ computer: "wkst1", user: "Carol Freeman", dest: "github.com", caption: ["Allowed", "Carol Freeman on wkst1 reaches github.com. Rule 2 matches first."] });
-    await runCase({ dest: "internetbadguys.com", caption: ["Blocked at DNS", "internetbadguys.com is categorised Phishing, so the DNS security setting stops it for everyone."] });
-    await runCase({ computer: "rwkst1", user: "Paul Cole", dest: "playboy.com", caption: ["Blocked \u00b7 Rule 18", "Paul Cole (Finance) on playboy.com: Adult Themes is a restricted category."], show: true });
-    await runCase({ user: "Anna Mariano", dest: "playboy.com", caption: ["Allowed \u00b7 Rule 34", "Same site, but Anna Mariano is in HR, so the Finance rule does not apply."] });
-    await runCase({ user: "Paul Cole", dest: "pastebin.com", caption: ["Isolated \u00b7 Rule 15", "pastebin.com opens in a remote browser instead of being blocked outright."] });
+    await runCase({ computer: "wkst1", user: "Carol Freeman", dest: "github.com", caption: ["Allowed", "A normal work site: Carol can reach github.com from her laptop."] });
+    await runCase({ dest: "internetbadguys.com", caption: ["Blocked: known phishing site", "internetbadguys.com is flagged as phishing, so DNS security stops it for everyone."] });
+    await runCase({ computer: "rwkst1", user: "Paul Cole", dest: "playboy.com", caption: ["Blocked for Finance", "Paul works in Finance and tries an adult site. A Finance policy blocks it."], show: true });
+    await runCase({ user: "Anna Mariano", dest: "playboy.com", caption: ["Allowed for HR", "Same site, different person. Anna is in HR, so the Finance policy does not apply."] });
+    await runCase({ user: "Paul Cole", dest: "pastebin.com", caption: ["Isolated, not blocked", "Risky sites like pastebin.com open in a safe remote browser instead of on the device."] });
     await d.caption(""); await d.parkCursor(700, 960);
   },
   async s3() {
     await d.card("Feature 3 of 4", "Traffic steering exclusions", "Destinations configured to bypass Secure Access entirely", 2700, 3);
-    await d.caption("Traffic Steering list", "dl.duosecurity.com is set to bypass Secure Access and the web proxy.");
+    await d.caption("The traffic steering list", "Some destinations are set to skip Secure Access entirely, like Duo's download server.");
     const r = await d.pageRect(`[...document.querySelectorAll("tr")].find(t => /dl\\.duosecurity\\.com/.test(t.innerText) && /Bypass Secure Access/.test(t.innerText))`, null);
     await P().ev(`(() => { [...document.querySelectorAll("tr")].filter(t => /dl\\.duosecurity\\.com/.test(t.innerText)).forEach(t => { t.style.outline = "3px solid #2563EB"; t.style.outlineOffset = "-3px"; t.style.background = "rgba(37,99,235,.08)"; }); })()`);
     await d.move(r.x, r.y, 600); await sleep(2800);
@@ -80,13 +80,13 @@ const scenes = {
   },
   async s4() {
     await d.openPanelClick();
-    await runCase({ dest: "dl.duosecurity.com", caption: ["Bypassed", "The checker honours the exclusion: dl.duosecurity.com skips policy and goes direct."], hold: 2300 });
+    await runCase({ dest: "dl.duosecurity.com", caption: ["Bypassed", "The checker knows about the exclusion: dl.duosecurity.com goes direct, with no policy applied."], hold: 2300 });
     await d.caption("");
   },
   async s5() {
     await Promise.all([d.card("Feature 4 of 4", "Remote access VPN and firewall", "A private IP, port and protocol checked against firewall rules", 2700, 4), d.fresh()]);
     await d.openPanelClick();
-    await d.caption("Remote access VPN", "Paul Cole to 10.141.46.1 on TCP 443 falls to the default For all private access block.");
+    await d.caption("Remote access VPN", "Paul connects over VPN to a private address. No policy allows it, so the firewall blocks it.");
     await d.clickPanel(`document.querySelector('input.tp-connection-radio[value="vpn"]').closest("label")`);
     await d.pick("tp-src-identity", "paul", "Paul Cole", TYPE);
     await d.pick("tp-src-computer", "rwkst1", "rwkst1", TYPE);
