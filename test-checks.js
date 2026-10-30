@@ -235,6 +235,7 @@ function makeRule(id, name, opts = {}) {
     destinations: opts.destinations || ["any"],
     applications: opts.applications || [],
     conditions: conds,
+    trafficScope: opts.trafficScope || null,
     logging_enabled: opts.logging !== undefined ? opts.logging : true,
     security_profiles: opts.security_profiles || { ips_enabled: true, amp_malware_enabled: true, tls_decryption_enabled: true, dlp_enabled: true },
   };
@@ -300,6 +301,24 @@ console.log("\n=== Group 2: checkShadowing ===");
   ];
   const findings = sandbox.checkShadowing(rules);
   assert(find(findings, "shadowing", "Default rule") === undefined, "Shadowing: default rules skipped");
+}
+{
+  // Internet catch-all must not shadow a Private Access allow. destination.all
+  // is only a catch-all inside its own traffic scope.
+  const rules = [
+    makeRule(1, "Default Allow", { action: "allow", isDefault: true, priority: 1, trafficScope: "public_internet", conditions: [cond("umbrella.source.all", "=", true), cond("umbrella.destination.all", "=", true)] }),
+    makeRule(2, "Private app allow", { action: "allow", priority: 2, trafficScope: "private_network", conditions: [cond("umbrella.source.all", "=", true), cond("umbrella.destination.private_resource_ids", "INTERSECT", [9])] }),
+  ];
+  const findings = sandbox.checkShadowing(rules);
+  assert(find(findings, "shadowing", "Private app allow") === undefined, "Shadowing: internet default does not shadow private access");
+}
+{
+  const rules = [
+    makeRule(1, "Allow private apps", { action: "allow", priority: 1, trafficScope: "private_network", conditions: [cond("umbrella.source.all", "=", true), cond("umbrella.destination.all", "=", true)] }),
+    makeRule(2, "Allow one private app", { action: "allow", priority: 2, trafficScope: "private_network", conditions: [cond("umbrella.source.all", "=", true), cond("umbrella.destination.private_resource_ids", "INTERSECT", [9])] }),
+  ];
+  const findings = sandbox.checkShadowing(rules);
+  assert(find(findings, "shadowing", "Allow one private app") !== undefined, "Shadowing: same-scope private catch-all still shadows");
 }
 
 // ---------------------------------------------------------------------------
