@@ -52,11 +52,19 @@ const scenes = {
     await d.blackCard("Secure Access Extension Demo", 2600);
     await d.card("Feature 1 of 4", "See inside any rule", "Hover groups, categories and nested objects right on the Access Policy table", 2700, 1);
     await d.scrollTable(17, 700);
-    await d.caption("A real company policy", "Finance Content Blocks stops Finance staff reaching risky categories such as gambling and adult sites.");
-    await d.hoverCell(srcCell(17), 450, true); await sleep(700);
-    await d.hoverCell(expChip(0), 350); await sleep(1500);
-    await d.hoverCell(dstItem(17, 0), 450); await sleep(700);
-    await d.hoverCell(expChip(0), 350); await sleep(2300);
+    await d.caption("Finance", "36 people, including Paul Cole. The group expands on the rule that blocks risky sites for Finance.");
+    await d.hoverCell(srcCell(17), 500, true); await sleep(1400);
+    await d.hoverCell(expChip(0), 400); await sleep(2600);
+    await d.parkCursor(); await sleep(400);
+    await d.scrollTable(12, 700);
+    await d.caption("HR", "Anna Mariano, Ryan Campbell and Lee Chang. Same kind of group, a different rule.");
+    await d.hoverCell(srcCell(12), 500, true); await sleep(1400);
+    await d.hoverCell(expChip(0), 400); await sleep(2600);
+    await d.parkCursor(); await sleep(400);
+    await d.scrollTable(29, 800);
+    await d.caption("Machine Tunnel Pool", "On Machine Tunnel Remote Access, the destination expands to the tunnel network: 10.100.67.0/24.");
+    await d.hoverCell(dstItem(29, 0), 500); await sleep(1400);
+    await d.hoverCell(expChip(0), 400); await sleep(2600);
     await d.parkCursor(); await d.caption("");
   },
   async s2() {

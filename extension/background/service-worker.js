@@ -808,7 +808,16 @@ function _dimensionBroadOrEqual(blockerConds, ruleConds) {
 // "unknown" too closes this gap generally, not just for destination_list_ids
 // specifically — there will always be condition types _conditionDimension()
 // doesn't yet recognize.
+function _sameTrafficScope(blocker, rule) {
+  const a = blocker.trafficScope || null;
+  const b = rule.trafficScope || null;
+  // Missing scope is old cached data. Do not invent a separation we cannot see.
+  if (!a || !b) return true;
+  return a === b;
+}
+
 function _matchCriteriaBroadOrEqual(blocker, rule) {
+  if (!_sameTrafficScope(blocker, rule)) return false;
   const bB = _bucketConditionsByDimension(blocker);
   const bR = _bucketConditionsByDimension(rule);
   return (
