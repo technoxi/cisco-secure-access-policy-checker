@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Convert a Secure Access Activity Search export (.xlsx or .csv) to JSON Lines.
 
-    python3 qa/export-to-jsonl.py <export.xlsx|export.csv> [qa/data/events.jsonl] [--aggregate]
+    python3 tools/replay/export-to-jsonl.py <export.xlsx|export.csv> [tools/replay/data/events.jsonl] [--aggregate]
 
 Empty cells are dropped; the header's byte-order mark is stripped.
 
@@ -58,7 +58,7 @@ def aggregate(source, target):
 def main():
     args = [arg for arg in sys.argv[1:] if not arg.startswith("--")]
     source = args[0]
-    target = args[1] if len(args) > 1 else "qa/data/events.jsonl"
+    target = args[1] if len(args) > 1 else "tools/replay/data/events.jsonl"
     os.makedirs(os.path.dirname(target) or ".", exist_ok=True)
     if "--aggregate" in sys.argv:
         aggregate(source, target)

@@ -3,16 +3,16 @@
 // destination, answer category/app questions from the log. Compares the
 // predicted layer and rule with what Secure Access logged.
 //
-//   node qa/replay-activity.mjs <events.jsonl> <extension-data.json> [results.json]
+//   node tools/replay/replay-activity.mjs <events.jsonl> <extension-data.json> [results.json]
 //
-// events.jsonl        qa/export-to-jsonl.py output (Activity Search export)
-// extension-data.json qa/dump-extension-data.mjs output (rules + catalogs)
+// events.jsonl        tools/replay/export-to-jsonl.py output (Activity Search export)
+// extension-data.json tools/replay/dump-extension-data.mjs output (rules + catalogs)
 import fs from "node:fs";
 import vm from "node:vm";
 import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
-const REPO = new URL("..", import.meta.url).pathname.replace(/\/$/, "");
-const [EVENTS = "qa/data/events.jsonl", DATA = "qa/data/extension-data.json", OUT = "qa/data/replay-results.json"] = process.argv.slice(2).filter(arg => !arg.startsWith("--"));
+const REPO = new URL("../..", import.meta.url).pathname.replace(/\/$/, "");
+const [EVENTS = "tools/replay/data/events.jsonl", DATA = "tools/replay/data/extension-data.json", OUT = "tools/replay/data/replay-results.json"] = process.argv.slice(2).filter(arg => !arg.startsWith("--"));
 // --investigate=<lookups.json>: answer only from Cisco Investigate lookups
 // ({ host: lookupDestination result }), never from the log, and replay only
 // events for those hosts. Any question left counts as a failure.

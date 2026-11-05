@@ -19,7 +19,7 @@ const vm = require("vm");
 
 // Extract just the check-related functions from service-worker.js
 const swSrc = fs.readFileSync(
-  path.join(__dirname, "extension/background/service-worker.js"),
+  path.join(__dirname, "../extension/background/service-worker.js"),
   "utf-8"
 );
 

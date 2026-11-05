@@ -4,10 +4,10 @@
 // Run: node test-describe-agent.js
 const assert = require("node:assert/strict");
 
-const ip = require("./extension/popup/ip-address.js");
+const ip = require("../extension/popup/ip-address.js");
 globalThis.IPAddress = ip;
-const model = require("./extension/popup/traffic-path.js");
-const Agent = require("./extension/popup/describe-agent.js");
+const model = require("../extension/popup/traffic-path.js");
+const Agent = require("../extension/popup/describe-agent.js");
 
 const lookups = {
   sourceUsers: { 11: "Aang Leung (aang@corp.example)", 12: "Denise Okafor (denise@corp.example)", 13: "Denise Park (dpark@corp.example)" },

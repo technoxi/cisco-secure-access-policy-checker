@@ -73,57 +73,51 @@ Simulates the actual Cisco Secure Access enforcement order based on connection t
 
 > *Note*: Verdicts reflect rule configurations. Upstream security profile blocks (file inspection, DLP, tenant controls, IPS) can still apply to observed traffic.
 
-## QA against Activity Search
+## Replaying Activity Search exports
 
-Replays a real Activity Search export through the checker (form, model and matcher) against the tenant's live rules, and compares the predicted layer and rule with what was logged. Tenant data stays in `qa/data/`, which is git-ignored.
-
-```
-python3 qa/export-to-jsonl.py export.xlsx              # → qa/data/events.jsonl
-node qa/dump-extension-data.mjs 9444 dump qa/data/extension-data.json   # from a signed-in Chrome, see the file header
-node qa/replay-activity.mjs                            # prints accuracy per layer and rule
-```
-
-By default the replay answers category, app and threat questions from what the log recorded. `--investigate=<lookups.json>` answers them only from Cisco Investigate lookups (`{ host: lookupDestination result }`, collected from the extension's service worker) to measure the fully automatic path. Blocks the log attributes to a scanned file, DLP, app controls or IPS are counted separately: they depend on content, not on the destination.
-
-## Tests
+`tools/replay/` replays a real Activity Search export through the checker (form, model and matcher) against the tenant's live rules, and compares the predicted layer and rule with what was logged. Tenant data stays in `tools/replay/data/`, which is git-ignored.
 
 ```
-node test-traffic-path.js      # Policy Checker model through the real matcher
-node test-matcher.js
-node test-policy-regressions.js
-node test-checks.js
-node test-membership.js
+python3 tools/replay/export-to-jsonl.py export.xlsx                           # -> tools/replay/data/events.jsonl
+node tools/replay/dump-extension-data.mjs 9444 dump tools/replay/data/extension-data.json   # from a signed-in Chrome, see the file header
+node tools/replay/replay-activity.mjs                                         # prints accuracy per layer and rule
 ```
+
+By default the replay answers category, app and threat questions from what the log recorded. `--investigate=<lookups.json>` answers them only from Cisco Investigate lookups (`{ host: lookupDestination result }`, collected from the extension's service worker) to measure the fully automatic path. Blocks the log attributes to a scanned file, DLP, app controls or IPS are counted separately, because they depend on content and not on the destination.
+
+## Development
+
+Requires Node.js 20 or later. There are no dependencies.
+
+```
+npm test                 # all headless tests in test/
+npm run test:browser     # optional, needs Chrome with --remote-debugging-port=9333
+```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request, and [SECURITY.md](SECURITY.md) for what the extension stores and how to report a vulnerability.
 
 ## Repo structure
 
 ```
-extension/
-├── manifest.json              # MV3 manifest
-├── background/
-│   └── service-worker.js      # Token capture, API fetching, data resolution
-├── content/
-│   ├── content-script.js      # Dashboard overlay: panel, hover cards, rule highlight, result card
-│   ├── token-sniffer.js       # Intercepts auth tokens from dashboard responses
-│   ├── styles.css             # Dashboard overlay styles
-│   └── token-relay.js         # Relays captured tokens to the service worker
-├── popup/
-│   ├── popup.html             # Extension popup UI (also embedded in the dashboard panel)
-│   ├── popup.js               # Popup logic, reads from chrome.storage
-│   ├── traffic-path.js        # Policy Checker model: connections, stages, evaluation
-│   ├── traffic-path-panel.js  # Policy Checker UI
-│   ├── traffic-path.css       # Policy Checker styles
-│   ├── matcher.js             # Rule condition matching and label resolution
-│   ├── ip-address.js          # IPv4/IPv6 and CIDR parsing
-│   └── popup-sections.js      # Rules & Audit tab
-├── lib/
-│   └── debug-log.js           # Persistent debug logging
-└── data/
-    ├── apps-lookup.json        # Application ID → name mappings
-    ├── categories-lookup.json  # Content category bit position → category ID and name
-    └── protocols-lookup.json   # Protocol number → name mappings
-qa/
-├── export-to-jsonl.py         # Activity Search export (.xlsx/.csv) → JSON Lines
-├── dump-extension-data.mjs    # Read rules + catalogs from a signed-in Chrome
-└── replay-activity.mjs        # Replay events through the checker, report mismatches
+extension/                     # MV3 extension (load this folder unpacked)
+test/                          # Headless tests, run with npm test
+  browser/                     # Optional Chrome DevTools protocol tests and UI fixture
+  fixtures/                    # Rule data used by tests
+tools/replay/                  # Optional Activity Search replay tooling
+scripts/run-tests.js           # Test runner
 ```
+
+Inside `extension/`:
+
+```
+manifest.json                  # MV3 manifest
+background/service-worker.js   # Token capture, API fetching, data resolution
+content/                       # Dashboard overlay, token sniffer and relay, styles
+popup/                         # Panel UI, rule matcher, traffic-path model, IP parsing, Describe mode
+lib/debug-log.js               # Persistent debug logging
+data/                          # Bundled app, category, protocol and exclusion lookups
+```
+
+## Disclaimer
+
+This project is not affiliated with or endorsed by Cisco. Cisco, Cisco Secure Access and Umbrella are trademarks of Cisco Systems, Inc. Released under the [MIT License](LICENSE).

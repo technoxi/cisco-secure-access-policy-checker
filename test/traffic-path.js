@@ -6,11 +6,11 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const vm = require("node:vm");
 
-const ip = require("./extension/popup/ip-address.js");
+const ip = require("../extension/popup/ip-address.js");
 globalThis.IPAddress = ip;
-const model = require("./extension/popup/traffic-path.js");
+const model = require("../extension/popup/traffic-path.js");
 const context = vm.createContext({ window: { IPAddress: ip }, console, Array, String, Object, JSON, Math, Set, Map, RegExp, parseInt, isNaN, Number });
-vm.runInContext(fs.readFileSync("extension/popup/matcher.js", "utf8"), context);
+vm.runInContext(fs.readFileSync(require("node:path").join(__dirname, "..", "extension/popup/matcher.js"), "utf8"), context);
 const Matcher = context.window.Matcher;
 
 let passed = 0;
@@ -83,6 +83,7 @@ test("connection limits sources", () => {
   assert.deepEqual(model.CONNECTIONS.client.sources, ["roaming", "identity"]);
   assert.deepEqual(model.CONNECTIONS.va.sources, ["site", "internalIp", "identity", "computer", "network"]);
   assert.deepEqual(model.CONNECTIONS.network.sources, ["network"]);
+  assert.deepEqual(model.CONNECTIONS.vpn.sources, ["identity", "internalIp"]);
   assert.deepEqual(model.CONNECTIONS.tunnel.sources, ["tunnel", "branch", "internalIp", "identity", "computer", "sdwan", "sgt"]);
   // A site picked earlier is ignored once the connection is Secure Client.
   const request = build({ connection: "client", sources: { roaming: "sourceRoaming:9", site: "sourceSites:21" }, destination: "example.com" });

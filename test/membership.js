@@ -19,7 +19,7 @@ const path = require("path");
 const vm = require("vm");
 
 const swSrc = fs.readFileSync(
-  path.join(__dirname, "extension/background/service-worker.js"),
+  path.join(__dirname, "../extension/background/service-worker.js"),
   "utf-8"
 );
 

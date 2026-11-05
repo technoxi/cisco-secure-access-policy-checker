@@ -1,30 +1,27 @@
-# Node
 node_modules/
 package-lock.json
 
-# OS files
 .DS_Store
 Thumbs.db
-
-# IDE settings
 .vscode/
 .idea/
-
-# Chrome user data (dev)
 *.user-data-dir/
 
-# Snippet workspace
+# Local agent and editor state
+.claude/
 .snippet/
 
-# Test/debug scripts
+# Local debugging scripts and build output
 extension/scripts/
-*.mp4
-
-# Archives
 *.zip
 
-# QA inputs (tenant data)
-qa/data/
+# Demo and recording media
+*.mp4
+*.mov
+*.webm
 
-# Python bytecode
+# Tenant data (never commit)
+tools/replay/data/
+*.har
+
 __pycache__/

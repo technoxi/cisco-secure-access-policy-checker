@@ -31,7 +31,7 @@ async function main() {
   };
   try {
     await evaluate('window.fetch = async () => ({ json: async () => ({}) });');
-    await evaluate(fs.readFileSync('extension/popup/popup-sections.js', 'utf8'));
+    await evaluate(fs.readFileSync(require('node:path').join(__dirname, '../../extension/popup/popup-sections.js'), 'utf8'));
     const results = await evaluate(`(async () => {
       const results = [];
       const check = (condition, name) => { if (!condition) throw new Error(name); results.push(name); };

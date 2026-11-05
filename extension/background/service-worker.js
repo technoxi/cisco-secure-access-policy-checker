@@ -2070,8 +2070,8 @@ const MEMBERSHIP_CONFIG = {
   networkObjectGroups: {
     tokenKey: "sse_token", leafKind: "networkObjects",
     wrapper: ["data", "items", "results"], idField: "id", nameField: ["name", "label"],
-    memberFields: ["objects", "objectIds", "networkObjectIds"],
-    groupFields: ["groups"],
+    memberFields: ["objects", "objectIds", "networkObjects", "networkObjectIds"],
+    groupFields: ["groups", "groupIds", "networkObjectGroups", "networkObjectGroupIds"],
     // Returns 400 without ?ids= (see OBJECT_ENDPOINTS).
     url: (o, ids) => `https://api.sse.cisco.com/policies/v2/objects/networkObjectGroups?ids=${(ids || []).map(encodeURIComponent).join(",")}`,
     needsIds: true,
@@ -2088,7 +2088,7 @@ const MEMBERSHIP_CONFIG = {
     tokenKey: "sse_token", leafKind: "serviceObjects",
     wrapper: ["data", "items", "results"], idField: "id", nameField: ["name", "label"],
     memberFields: ["objects", "serviceObjects", "serviceObjectIds"],
-    groupFields: ["groups"],
+    groupFields: ["groups", "groupIds", "serviceObjectGroups", "serviceObjectGroupIds"],
     // Returns 400 without ?ids= (see OBJECT_ENDPOINTS).
     url: (o, ids) => `https://api.sse.cisco.com/policies/v2/objects/serviceObjectGroups?ids=${(ids || []).map(encodeURIComponent).join(",")}`,
     needsIds: true,
@@ -2283,11 +2283,6 @@ function _extractMemberList(item, key) {
     seen.add(token);
     members.push(classified);
   };
-  for (const f of cfg.memberFields || []) {
-    if (Array.isArray(item[f]) && item[f].length) {
-      item[f].forEach((m) => push(_classifyMember(m, key)));
-    }
-  }
   for (const f of cfg.groupFields || []) {
     if (Array.isArray(item[f]) && item[f].length) {
       item[f].forEach((m) => {
@@ -2295,6 +2290,11 @@ function _extractMemberList(item, key) {
         if (classified && classified.id !== undefined) classified.kind = key;
         push(classified);
       });
+    }
+  }
+  for (const f of cfg.memberFields || []) {
+    if (Array.isArray(item[f]) && item[f].length) {
+      item[f].forEach((m) => push(_classifyMember(m, key)));
     }
   }
   return members;

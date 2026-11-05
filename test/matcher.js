@@ -14,9 +14,9 @@
 // ---------------------------------------------------------------------------
 // Bootstrap matcher.js in a Node-safe way (no window/document)
 // ---------------------------------------------------------------------------
-const fakeWindow = { IPAddress: require("./extension/popup/ip-address.js") };
+const fakeWindow = { IPAddress: require("../extension/popup/ip-address.js") };
 const matcherSrc = require("fs").readFileSync(
-  require("path").join(__dirname, "extension/popup/matcher.js"),
+  require("path").join(__dirname, "../extension/popup/matcher.js"),
   "utf-8"
 );
 // matcher.js is an IIFE that assigns to `global` (which is `window` in-browser).

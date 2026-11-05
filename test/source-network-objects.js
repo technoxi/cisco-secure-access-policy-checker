@@ -3,15 +3,15 @@
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const vm = require("node:vm");
-const ip = require("./extension/popup/ip-address.js");
+const ip = require("../extension/popup/ip-address.js");
 globalThis.IPAddress = ip;
-const model = require("./extension/popup/traffic-path.js");
+const model = require("../extension/popup/traffic-path.js");
 const context = vm.createContext({ window: { IPAddress: ip }, console });
-vm.runInContext(fs.readFileSync("extension/popup/matcher.js", "utf8"), context);
+vm.runInContext(fs.readFileSync(require("node:path").join(__dirname, "..", "extension/popup/matcher.js"), "utf8"), context);
 const matcher = context.window.Matcher;
-const worker = fs.readFileSync("extension/background/service-worker.js", "utf8");
+const worker = fs.readFileSync(require("node:path").join(__dirname, "..", "extension/background/service-worker.js"), "utf8");
 vm.runInContext(worker.slice(worker.indexOf("function _conditionDimension("), worker.indexOf("function _isCatchAllCondition(")), context);
-const [r39, r40, dns] = require("./qa/source-network-rules.json");
+const [r39, r40, dns] = require("./fixtures/source-network-rules.json");
 const address = value => ({ members: [{ kind: "address", value }], resolved: true });
 const lookups = { sourceUsers: { 7: "Test user" }, memberMaps: {
   networkObjects: { 151027: address("10.0.0.0/8"), 151028: address("10.141.195.0/24"), 500288057: address("10.141.197.0/24"), syntheticDnsSubnet: address("192.0.2.0/24") },

@@ -1,0 +1,12 @@
+{
+  "name": "cisco-secure-access-policy-checker",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Chrome extension that evaluates and explains Cisco Secure Access policy verdicts.",
+  "license": "MIT",
+  "scripts": {
+    "test": "node scripts/run-tests.js",
+    "test:browser": "node scripts/run-tests.js --browser"
+  },
+  "engines": { "node": ">=20" }
+}

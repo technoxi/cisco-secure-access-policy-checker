@@ -64,8 +64,8 @@
     },
     vpn: {
       label: "Remote access VPN", layers: "Firewall + Web",
-      description: "Secure Client in VPN mode: all traffic goes to Secure Access. Traffic carries the AD user and computer and the VPN address.",
-      sources: ["identity", "computer", "internalIp"],
+      description: "Secure Client in VPN mode: all traffic goes to Secure Access. Traffic carries the AD user and the VPN address.",
+      sources: ["identity", "internalIp"],
     },
     network: {
       label: "Network DNS", layers: "DNS only",

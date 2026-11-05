@@ -3,11 +3,11 @@
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const vm = require("node:vm");
-const ip = require("./extension/popup/ip-address.js");
+const ip = require("../extension/popup/ip-address.js");
 globalThis.IPAddress = ip;
-const model = require("./extension/popup/traffic-path.js");
+const model = require("../extension/popup/traffic-path.js");
 const context = vm.createContext({ window: { IPAddress: ip }, console });
-vm.runInContext(fs.readFileSync("extension/popup/matcher.js", "utf8"), context);
+vm.runInContext(fs.readFileSync(require("node:path").join(__dirname, "..", "extension/popup/matcher.js"), "utf8"), context);
 const catalogs = {
   sourceUsers: { 101: "Alice" }, sourceGroups: { 201: "Staff" }, sourceRoaming: { 301: "Laptop" },
   sourceIdentityTypeIds: { 101: 7, 201: 3, 301: 9 },

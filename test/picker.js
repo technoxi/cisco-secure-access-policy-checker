@@ -80,7 +80,7 @@ function fire(element, type, data = {}) {
   element.dispatchEvent(event);
   return event;
 }
-const filename = 'extension/popup/traffic-path-panel.js';
+const filename = require('node:path').join(__dirname, '..', 'extension/popup/traffic-path-panel.js');
 const source = fs.readFileSync(filename, 'utf8');
 const exportText = 'root.TrafficPathPanel = { create };';
 assert.equal(source.split(exportText).length, 2, 'private-picker export anchor must be unique');

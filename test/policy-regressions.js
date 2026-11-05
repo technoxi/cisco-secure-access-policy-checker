@@ -4,9 +4,9 @@
 const assert = require("assert");
 const fs = require("fs");
 const vm = require("vm");
-const context = { window: { IPAddress: require("./extension/popup/ip-address.js") }, console, Array, String, Object, JSON, Math, Set, RegExp, parseInt, isNaN };
+const context = { window: { IPAddress: require("../extension/popup/ip-address.js") }, console, Array, String, Object, JSON, Math, Set, RegExp, parseInt, isNaN };
 vm.createContext(context);
-vm.runInContext(fs.readFileSync("extension/popup/matcher.js", "utf8"), context);
+vm.runInContext(fs.readFileSync(require("node:path").join(__dirname, "..", "extension/popup/matcher.js"), "utf8"), context);
 const { Matcher } = context.window;
 
 function condition(attributeName, attributeOperator, attributeValue) {

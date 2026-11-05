@@ -3,14 +3,14 @@
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const vm = require("node:vm");
-const ip = require("./extension/popup/ip-address.js");
+const ip = require("../extension/popup/ip-address.js");
 globalThis.IPAddress = ip;
-const model = require("./extension/popup/traffic-path.js");
+const model = require("../extension/popup/traffic-path.js");
 const context = vm.createContext({ window: { IPAddress: ip }, console });
-vm.runInContext(fs.readFileSync("extension/popup/matcher.js", "utf8"), context);
+vm.runInContext(fs.readFileSync(require("node:path").join(__dirname, "..", "extension/popup/matcher.js"), "utf8"), context);
 const matcher = context.window.Matcher;
 
-const exclusions = JSON.parse(fs.readFileSync("extension/data/exclusions-lookup.json", "utf8"));
+const exclusions = JSON.parse(fs.readFileSync(require("node:path").join(__dirname, "..", "extension/data/exclusions-lookup.json"), "utf8"));
 const catalogs = {
   exclusions,
   sourceUsers: { 7: "Denise Adams" },

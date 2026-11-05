@@ -461,7 +461,7 @@ function ensureHoverPopoverStyle() {
     #sec-hover-popover {
       position: fixed;
       z-index: 2147483647;
-      width: min(440px, calc(100vw - 32px));
+      width: min(400px, calc(100vw - 32px));
       max-height: min(520px, calc(100vh - 32px));
       background: #FFFFFF;
       border: 1px solid #d8e0ea;
@@ -561,7 +561,7 @@ function ensureHoverPopoverStyle() {
     .sec-open > .sec-mp-chevron, .sec-mp-expandable:hover > .sec-mp-chevron,
     .sec-hp-expandable:hover > .sec-mp-chevron { color: #2563eb; transform: translateX(2px) rotate(45deg); }
     .sec-member-panel {
-      position: fixed; z-index: 2147483647; width: min(320px, calc(100vw - 32px));
+      position: fixed; z-index: 2147483647; width: min(280px, calc(100vw - 32px));
       max-height: min(440px, calc(100vh - 24px)); display: flex; flex-direction: column;
       background: #fff; border: 1px solid #d8e0ea; border-radius: 0;
       box-shadow: 0 1px 2px rgba(15,23,42,.06), 0 16px 40px rgba(15,23,42,.18);

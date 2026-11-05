@@ -54,7 +54,7 @@ async function main() {
     console,
   };
   vm.createContext(sandbox);
-  vm.runInContext(fs.readFileSync("extension/content/token-sniffer.js", "utf8"), sandbox);
+  vm.runInContext(fs.readFileSync(require("node:path").join(__dirname, "..", "extension/content/token-sniffer.js"), "utf8"), sandbox);
 
   await window.fetch("https://dashboard.sse.cisco.com/token", {
     headers: { "X-CSRF-TOKEN": csrfToken },

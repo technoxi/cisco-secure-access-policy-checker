@@ -5,11 +5,11 @@
 // Run: node test-describe-providers.js
 const assert = require("node:assert/strict");
 
-globalThis.IPAddress = require("./extension/popup/ip-address.js");
-const model = require("./extension/popup/traffic-path.js");
-const Llm = require("./extension/popup/llm-providers.js");
-const Stt = require("./extension/popup/speech-providers.js");
-const Agent = require("./extension/popup/describe-agent.js");
+globalThis.IPAddress = require("../extension/popup/ip-address.js");
+const model = require("../extension/popup/traffic-path.js");
+const Llm = require("../extension/popup/llm-providers.js");
+const Stt = require("../extension/popup/speech-providers.js");
+const Agent = require("../extension/popup/describe-agent.js");
 
 const reply = { connection: "vpn", sources: [{ kind: "identity", mention: "Aang" }], destination: "example.org", port: "22", protocol: "TCP", internalIp: "", question: "" };
 const ok = body => ({ ok: true, status: 200, json: async () => body });

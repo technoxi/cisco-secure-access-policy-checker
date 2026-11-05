@@ -2,7 +2,7 @@
 const assert = require('node:assert/strict');
 async function main() {
   const targets = await (await fetch('http://127.0.0.1:9333/json/list')).json();
-  const target = targets.find(t => t.type === 'page' && t.url.includes('/qa/ui-checker.html'));
+  const target = targets.find(t => t.type === 'page' && t.url.includes('/test/browser/ui-checker.html'));
   assert.ok(target, 'existing checker fixture on CDP9333');
   const socket = new WebSocket(target.webSocketDebuggerUrl);
   await new Promise(resolve => socket.addEventListener('open', resolve, { once: true }));

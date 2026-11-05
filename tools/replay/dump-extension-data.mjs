@@ -5,9 +5,9 @@
 //      chrome --remote-debugging-port=9444 --remote-allow-origins='*' \
 //        --load-extension=extension --disable-extensions-except=extension
 // 2. Sign in to the Secure Access dashboard and open the policy page
-//    (or: node qa/dump-extension-data.mjs 9444 goto about:blank <dashboard URL>).
+//    (or: node tools/replay/dump-extension-data.mjs 9444 goto about:blank <dashboard URL>).
 // 3. Once the extension has fetched (about a minute):
-//      node qa/dump-extension-data.mjs 9444 dump qa/data/extension-data.json
+//      node tools/replay/dump-extension-data.mjs 9444 dump tools/replay/data/extension-data.json
 //
 // Commands: url | goto <tab-url-substring|new> <url> | dump <out.json>
 //   goto <url-substr-of-tab|new> <url>   navigate (or open) a tab

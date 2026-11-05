@@ -35,10 +35,10 @@ async function main() {
   };
   sandbox.self = sandbox;
   vm.createContext(sandbox);
-  vm.runInContext(fs.readFileSync("extension/background/service-worker.js", "utf8"), sandbox);
-  const matcherContext = { window: { IPAddress: require("./extension/popup/ip-address.js") }, console };
+  vm.runInContext(fs.readFileSync(require("node:path").join(__dirname, "..", "extension/background/service-worker.js"), "utf8"), sandbox);
+  const matcherContext = { window: { IPAddress: require("../extension/popup/ip-address.js") }, console };
   vm.createContext(matcherContext);
-  vm.runInContext(fs.readFileSync("extension/popup/matcher.js", "utf8"), matcherContext);
+  vm.runInContext(fs.readFileSync(require("node:path").join(__dirname, "..", "extension/popup/matcher.js"), "utf8"), matcherContext);
   const { Matcher } = matcherContext.window;
   const canonical = fixture.ruleConditions;
   const cases = [

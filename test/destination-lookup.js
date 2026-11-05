@@ -51,7 +51,7 @@ async function main() {
   };
   sandbox.self = sandbox;
   vm.createContext(sandbox);
-  vm.runInContext(fs.readFileSync("extension/background/service-worker.js", "utf8"), sandbox);
+  vm.runInContext(fs.readFileSync(require("node:path").join(__dirname, "..", "extension/background/service-worker.js"), "utf8"), sandbox);
   assert.equal(vm.runInContext('tokenKeyForUrl("https://investigate.umbrella.com/domains/categorization/google.com")', sandbox), "mgmt_authz_token");
   assert.ok(webRequestFilter.urls.includes("https://investigate.umbrella.com/*"));
   const result = await vm.runInContext('lookupDestination("example.com", 7, "8176184")', sandbox);

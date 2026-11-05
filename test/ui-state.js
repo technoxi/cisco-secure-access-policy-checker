@@ -1,9 +1,10 @@
 'use strict';
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
+const path = require('node:path');
 const vm = require('node:vm');
-const model = require('./extension/popup/traffic-path.js');
-const panelSource = fs.readFileSync('extension/popup/traffic-path-panel.js', 'utf8');
+const model = require('../extension/popup/traffic-path.js');
+const panelSource = fs.readFileSync(path.join(__dirname, "..", 'extension/popup/traffic-path-panel.js'), 'utf8');
 function functionSource(name) {
   const start = panelSource.indexOf(`    ${name === 'check' ? 'async ' : ''}function ${name}(`);
   assert.ok(start >= 0, name);
